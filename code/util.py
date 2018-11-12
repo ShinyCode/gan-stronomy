@@ -21,14 +21,21 @@ def unpickle(filename):
         data = pickle.load(f)
     return data
 
-def get_ids():
+def load_ids():
     return unpickle(KEY_PATH)
 
-def get_classes():
+def load_classes():
     return unpickle(CLASS_PATH)
 
-def get_ingredients():
-    return json.loads(INGR_PATH)
+def load_ingredients():
+    with open(INGR_PATH) as f:
+        lines = ''.join([line.rstrip() for line in f])
+    lines = '{"data": '+ lines + '}'
+    lines_parsed = json.loads(lines)
+    ingrs = {}
+    for entry in lines_parsed['data']:
+        ingrs[entry['id']] = entry
+    return ingrs
 
 # Returns numpy array of size (IMAGE_SZ, IMAGE_SZ, 3)
 def resize_crop_img(img_filename):
