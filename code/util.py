@@ -7,6 +7,7 @@ import sys
 import os
 import json
 import lmdb
+import word2vec
 
 IMAGE_SZ = 128
 KEY_PATH = os.path.abspath('../../data/val_keys.pkl') # From val.tar
@@ -16,6 +17,7 @@ LMDB_PATH = os.path.abspath('../../data/val_lmdb/')
 RAW_IMG_PATH = os.path.abspath('../../data/val_raw')
 RSZ_IMG_PATH = os.path.abspath('../../data/val_rsz2')
 IMG_ID_PATH = os.path.abspath('../../data/img_ids.txt')
+VOCAB_PATH = os.path.abspath('../../data/vocab.bin')
 
 
 def reload():
@@ -69,13 +71,15 @@ def load_lmdb():
         lmdb_data[key] = pickle.loads(value, encoding='latin1')
     return lmdb_data
 
-def map_id_to_imgs(lmdb_data):
+# Returns a dict mapping recipe IDs to img IDs
+def map_recipe_id_to_img_id(lmdb_data):
     mapping = {}
-    for key, value in lmdb_data:
+    for key, value in lmdb_data.items():
         img_ids = []
         for img in value['imgs']:
-            pass
-
+            img_ids.append(img['id'].split('.')[0])
+        mapping[key] = img_ids
+    return mapping
 
 # Returns numpy array of size (IMAGE_SZ, IMAGE_SZ, 3)
 def resize_crop_img(img_filename):
@@ -120,3 +124,21 @@ def get_img_ids(in_path, out_path):
     with open(out_path, 'w') as f:
         for id in ids:
             f.write(id + '\n')
+
+# Each example is (recipe_id, recipe_embedding, img_id, img, klass)
+def build_dataset(recipe_ids, out_path):
+    classes = load_classes()
+    lmdb_data = load_lmdb()
+    recipe2img_id = map_recipe_id_to_img_id(lmdb_data)
+    for recipe_id in recipe_ids:
+        recipe_embedding = None
+        img_id = recipe2img_id[recipe_id][-1] # Pick the last one?
+        img = np.array(get_img_path(img_id, RAW_IMG_PATH))
+        klass = classes[recipe_id]
+
+def get_vocab(out_path):
+    model = word2vec.load(VOCAB_PATH)
+    vocab = model.vocab
+    f = open(out_path, 'w')
+    f.write("\n".join(vocab))
+    f.close()
