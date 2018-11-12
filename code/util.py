@@ -1,4 +1,6 @@
 # http://im2recipe.csail.mit.edu/im2recipe-journal.pdf
+# http://data.csail.mit.edu/im2recipe/model_e500_v-8.950.pth.tar
+# >> pip install -r requirements.txt
 import imp
 import numpy as np
 import pickle
