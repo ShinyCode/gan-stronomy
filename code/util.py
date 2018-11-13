@@ -146,20 +146,15 @@ def get_img_ids(in_path, out_path):
         for id in ids:
             f.write(id + '\n')
 
-# Each example is (recipe_id, recipe_embedding, img_id, img, klass)
-def build_dataset(recipe_ids, out_path):
-    classes = load_classes()
-    lmdb_data = load_lmdb()
-    recipe2img_id = map_recipe_id_to_img_id(lmdb_data)
-    for recipe_id in recipe_ids:
-        recipe_embedding = None
-        img_id = recipe2img_id[recipe_id][-1] # Pick the last one?
-        img = np.array(get_img_path(img_id, RAW_IMG_PATH))
-        klass = classes[recipe_id]
-
 def get_vocab(out_path):
     model = word2vec.load(VOCAB_PATH)
     vocab = model.vocab
     f = open(out_path, 'w')
     f.write("\n".join(vocab))
     f.close()
+
+def create_dir(dir_path):
+    try:
+        os.stat(dir_path)
+    except:
+        os.mkdir(dir_path)
