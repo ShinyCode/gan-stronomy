@@ -10,16 +10,18 @@ import os
 import json
 import lmdb
 import word2vec
+import random
 
 IMAGE_SZ = 128
-KEY_PATH = os.path.abspath('../../data/val_keys.pkl') # From val.tar
-CLASS_PATH = os.path.abspath('../../data/classes1M.pkl')
-INGR_PATH = os.path.abspath('../../data/det_ingrs.json')
-LMDB_PATH = os.path.abspath('../../data/val_lmdb/')
-RAW_IMG_PATH = os.path.abspath('../../data/val_raw')
-RSZ_IMG_PATH = os.path.abspath('../../data/val_rsz2')
-IMG_ID_PATH = os.path.abspath('../../data/img_ids.txt')
-VOCAB_PATH = os.path.abspath('../../data/vocab.bin')
+DATA_ROOT = os.path.abspath('../../data')
+KEY_PATH = os.path.join('val_keys.pkl') # From val.tar
+CLASS_PATH = os.path.join('classes1M.pkl')
+INGR_PATH = os.path.join('det_ingrs.json')
+LMDB_PATH = os.path.join('val_lmdb/')
+RAW_IMG_PATH = os.path.join('val_raw')
+RSZ_IMG_PATH = os.path.join('val_rsz2')
+IMG_ID_PATH = os.path.join('img_ids.txt')
+VOCAB_PATH = os.path.join('vocab.bin')
 
 
 def reload():
@@ -29,6 +31,9 @@ def unpickle(filename):
     with open(filename, 'rb') as f:
         data = pickle.load(f)
     return data
+
+def repickle(obj, out_path):
+    pickle.dumps(obj, out_path)
 
 def load_ids():
     return unpickle(KEY_PATH)
@@ -66,12 +71,26 @@ value: {'ingrs': array([1089,   35,   40,  364, 1067, 8620,   53, 2614,   87,  3
 def load_lmdb():
     lmdb_file = LMDB_PATH
     lmdb_env = lmdb.open(lmdb_file)
-    lmdb_txn = lmdb_env.begin()
-    lmdb_cursor = lmdb_txn.cursor()
-    lmdb_data = {}
-    for key, value in lmdb_cursor:
-        lmdb_data[key] = pickle.loads(value, encoding='latin1')
+    with lmdb_env.begin() as lmdb_txn:
+        lmdb_cursor = lmdb_txn.cursor()
+        lmdb_data = {}
+        for key, value in lmdb_cursor:
+            lmdb_data[key] = pickle.loads(value, encoding='latin1')
     return lmdb_data
+
+def sample_ids(lmdb_data, N):
+    return random.sample(list(lmdb_data.keys()), N)
+
+def slice_lmdb(ids, lmdb_data):
+    ids = set(ids)
+    return {k:lmdb[k] for k in lmdb_data if k in ids}
+
+def save_lmdb_data(lmdb_data, out_path):
+    lmdb_env = lmdb.open(out_path, map_size=int(1e11))
+    with lmdb_env.begin(write=True) as lmdb_txn:
+        for key in lmdb_data:
+            lmdb_txn.put('{}'.format(key), pickle.dumps(lmdb_data[key], encoding='latin1'))
+    print("Done saving lmdb_data to %s." % out_path)
 
 # Returns a dict mapping recipe IDs to img IDs
 def map_recipe_id_to_img_id(lmdb_data):
