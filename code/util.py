@@ -24,6 +24,7 @@ IMG_ID_PATH = os.path.join(DATA_ROOT, 'img_ids.txt')
 VOCAB_PATH = os.path.join(DATA_ROOT, 'vocab.bin')
 IM2RECIPE_ROOT = os.path.abspath('../../im2recipe-Pytorch')
 GEN_EMBEDDINGS_ROOT = os.path.join(IM2RECIPE_ROOT, 'gen_embeddings.py')
+MODEL_PATH = os.path.join(DATA_ROOT, 'model_e500_v-8.950.pth.tar')
 
 def reload():
     imp.reload(sys.modules[__name__])
@@ -31,6 +32,11 @@ def reload():
 def unpickle(filename):
     with open(filename, 'rb') as f:
         data = pickle.load(f)
+    return data
+
+def unpickle2(filename):
+    with open(filename, 'rb') as f:
+        data = pickle.load(f, encoding='latin1')
     return data
 
 def repickle(obj, out_path):
@@ -70,8 +76,7 @@ value: {'ingrs': array([1089,   35,   40,  364, 1067, 8620,   53, 2614,   87,  3
        [ 6.5326065e-02, -2.1252763e-08,  3.6092853e-08, ...,
         -1.4798085e-01,  7.7384055e-02,  4.0524910e-11]], dtype=float32)}
 '''
-def load_lmdb():
-    lmdb_file = LMDB_PATH
+def load_lmdb(lmdb_file=LMDB_PATH):
     lmdb_env = lmdb.open(lmdb_file)
     with lmdb_env.begin() as lmdb_txn:
         lmdb_cursor = lmdb_txn.cursor()
@@ -91,7 +96,7 @@ def save_lmdb_data(lmdb_data, out_path):
     lmdb_env = lmdb.open(out_path, map_size=int(1e11))
     with lmdb_env.begin(write=True) as lmdb_txn:
         for key in lmdb_data:
-            lmdb_txn.put(str.encode('{}'.format(key)), pickle.dumps(lmdb_data[key], protocol=2))
+            lmdb_txn.put(key, pickle.dumps(lmdb_data[key], protocol=2))
     print("Done saving lmdb_data to %s." % out_path)
 
 # Returns a dict mapping recipe IDs to img IDs
