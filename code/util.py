@@ -14,15 +14,16 @@ import random
 
 IMAGE_SZ = 128
 DATA_ROOT = os.path.abspath('../../data')
-KEY_PATH = os.path.join('val_keys.pkl') # From val.tar
-CLASS_PATH = os.path.join('classes1M.pkl')
-INGR_PATH = os.path.join('det_ingrs.json')
-LMDB_PATH = os.path.join('val_lmdb/')
-RAW_IMG_PATH = os.path.join('val_raw')
-RSZ_IMG_PATH = os.path.join('val_rsz2')
-IMG_ID_PATH = os.path.join('img_ids.txt')
-VOCAB_PATH = os.path.join('vocab.bin')
-
+KEY_PATH = os.path.join(DATA_ROOT, 'val_keys.pkl') # From val.tar
+CLASS_PATH = os.path.join(DATA_ROOT, 'classes1M.pkl')
+INGR_PATH = os.path.join(DATA_ROOT, 'det_ingrs.json')
+LMDB_PATH = os.path.join(DATA_ROOT, 'val_lmdb/')
+RAW_IMG_PATH = os.path.join(DATA_ROOT, 'val_raw')
+RSZ_IMG_PATH = os.path.join(DATA_ROOT, 'val_rsz2')
+IMG_ID_PATH = os.path.join(DATA_ROOT, 'img_ids.txt')
+VOCAB_PATH = os.path.join(DATA_ROOT, 'vocab.bin')
+IM2RECIPE_ROOT = os.path.abspath('../../im2recipe-Pytorch')
+GEN_EMBEDDINGS_ROOT = os.path.join(IM2RECIPE_ROOT, 'gen_embeddings.py')
 
 def reload():
     imp.reload(sys.modules[__name__])
@@ -33,7 +34,8 @@ def unpickle(filename):
     return data
 
 def repickle(obj, out_path):
-    pickle.dumps(obj, out_path)
+    with open(out_path, 'wb') as f:
+        pickle.dump(obj, f, protocol=2)
 
 def load_ids():
     return unpickle(KEY_PATH)
@@ -83,13 +85,13 @@ def sample_ids(lmdb_data, N):
 
 def slice_lmdb(ids, lmdb_data):
     ids = set(ids)
-    return {k:lmdb[k] for k in lmdb_data if k in ids}
+    return {k:lmdb_data[k] for k in lmdb_data if k in ids}
 
 def save_lmdb_data(lmdb_data, out_path):
     lmdb_env = lmdb.open(out_path, map_size=int(1e11))
     with lmdb_env.begin(write=True) as lmdb_txn:
         for key in lmdb_data:
-            lmdb_txn.put('{}'.format(key), pickle.dumps(lmdb_data[key], encoding='latin1'))
+            lmdb_txn.put(str.encode('{}'.format(key)), pickle.dumps(lmdb_data[key], protocol=2))
     print("Done saving lmdb_data to %s." % out_path)
 
 # Returns a dict mapping recipe IDs to img IDs
