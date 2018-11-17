@@ -2,17 +2,7 @@ import util
 import os
 import numpy as np
 import subprocess
-
-# # Each example is (recipe_id, recipe_embedding, img_id, img, klass)
-# def build_dataset(recipe_ids, out_path):
-#     classes = util.load_classes()
-#     lmdb_data = load_lmdb()
-#     recipe2img_id = map_recipe_id_to_img_id(lmdb_data)
-#     for recipe_id in recipe_ids:
-#         recipe_embedding = None
-#         img_id = recipe2img_id[recipe_id][-1] # Pick the last one?
-#         img = np.array(get_img_path(img_id, RAW_IMG_PATH))
-#         klass = classes[recipe_id]
+import sys
 
 def preprocess_img(img):
     return np.array(img, dtype=np.float32) / 255.0
@@ -77,3 +67,13 @@ def gen_dataset(N, data_path, compute_embed=True):
     print('Saving dataset...')
     util.repickle({'data': dataset, 'class_mapping': classes}, os.path.join(data_path, 'data.pkl'))
     print('...done!')
+
+def main():
+    if len(sys.argv) < 3:
+        print('Usage: python3 gen_dataset.py [N] [output_path]')
+        exit()
+
+    gen_dataset(int(sys.argv[1]), sys.argv[2], compute_embed=True)
+
+if __name__ == '__main__':
+    main()

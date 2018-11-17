@@ -5,7 +5,7 @@ class GANstronomyDataset(data.Dataset):
     def __init__(self, data_path):
         dataset = util.unpickle(data_path)
         self.data = dataset['data']
-        self.class_mapping = data['class_mapping']
+        self.class_mapping = dataset['class_mapping']
         self.ids = list(self.data.keys())
 
     def __getitem__(self, index):
