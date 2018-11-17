@@ -41,11 +41,15 @@ def gen_dataset(N, data_path, compute_embed=True):
     # Fill in everything except embeddings
     print('Filling in everything except embeddings...')
     dataset = {}
+    classes = {} # Maps raw class to the smallest number needed
     for recipe_id in recipe_ids:
         sample = {}
         sample['recipe_id'] = recipe_id.decode('utf-8')
         sample['img_id'] = recipe2img_id[recipe_id][-1]
-        sample['class'] = recipe_classes[recipe_id.decode('utf-8')]
+        sample['class_raw'] = recipe_classes[recipe_id.decode('utf-8')]
+        if sample['class_raw'] not in classes:
+            classes[sample['class_raw']] = len(classes)
+        sample['class'] = classes[sample['class_raw']]
         img = util.resize_crop_img(util.get_img_path(sample['img_id'], util.RAW_IMG_PATH))
         save_img(sample['img_id'], img, raw_img_path)
         sample['img_pre'] = preprocess_img(img)
@@ -71,5 +75,5 @@ def gen_dataset(N, data_path, compute_embed=True):
             assert embedding_id in dataset
             dataset[embedding_id]['recipe_emb'] = embeddings[i]
     print('Saving dataset...')
-    util.repickle(dataset, os.path.join(data_path, 'data.pkl'))
+    util.repickle({'data': dataset, 'class_mapping': classes}, os.path.join(data_path, 'data.pkl'))
     print('...done!')

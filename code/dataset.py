@@ -3,7 +3,9 @@ import util
 
 class GANstronomyDataset(data.Dataset):
     def __init__(self, data_path):
-        self.data = util.unpickle(data_path)
+        dataset = util.unpickle(data_path)
+        self.data = dataset['data']
+        self.class_mapping = data['class_mapping']
         self.ids = list(self.data.keys())
 
     def __getitem__(self, index):
@@ -17,3 +19,6 @@ class GANstronomyDataset(data.Dataset):
 
     def __len__(self, index):
         return len(self.ids)
+
+    def num_classes(self):
+        return len(self.class_mapping)
