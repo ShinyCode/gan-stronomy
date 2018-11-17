@@ -54,12 +54,12 @@ def main():
             # Adversarial ground truths
             all_real = Variable(FloatTensor(batch_size, 1).fill_(1.0), requires_grad=False).to(device)
             all_fake = Variable(FloatTensor(batch_size, 1).fill_(0.0), requires_grad=False).to(device)
-            
+
             # Train Generator
             G_optimizer.zero_grad()
             imgs_gen = G(recipe_embs, classes_one_hot)
             fake_probs = D(imgs_gen, classes_one_hot) # TODO: maybe use MSE loss to condition generator
-            G_loss = CRITERION(fake_probs, all_fake)
+            G_loss = CRITERION(fake_probs, all_real)
             G_loss.backward()
             G_optimizer.step()
 
@@ -70,7 +70,7 @@ def main():
             D_loss = (CRITERION(fake_probs, all_fake) + CRITERION(real_probs, all_real)) / 2
             D_loss.backward()
             D_optimizer.step()
-            
-            
+
+
 if __name__ == '__main__':
     main()
