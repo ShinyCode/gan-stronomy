@@ -12,12 +12,8 @@ class GANstronomyDataset(data.Dataset):
         img_id = item['img_id']
         klass = item['class']
         recipe_emb = item['recipe_emb']
-        img = self.normalize_img(item['img_pre']) # A misnomer - should actually just be img_raw
+        img = item['img_pre'] # The preprocessed image
         return [recipe_id, recipe_emb, img_id, img, klass]
 
     def __len__(self, index):
         return len(self.ids)
-
-    def normalize_img(img): # Squeezes image into [0, 1] range
-        assert img.dtype == np.float32
-        return img / 255.0

@@ -14,8 +14,8 @@ import subprocess
 #         img = np.array(get_img_path(img_id, RAW_IMG_PATH))
 #         klass = classes[recipe_id]
 
-def preprocess_img(img): # TODO: maybe center mean
-    return np.array(img, dtype=np.float32)
+def preprocess_img(img):
+    return np.array(img, dtype=np.float32) / 255.0
 
 def save_img(id, img, raw_img_path):
     out_filename = id + '.png'
