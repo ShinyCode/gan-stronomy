@@ -4,8 +4,9 @@ import numpy as np
 import subprocess
 import sys
 
+# Squeezes image to [0, 1], and also makes sure it's in [C, H, W] format
 def preprocess_img(img):
-    return np.array(img, dtype=np.float32) / 255.0
+    return np.array(np.transpose(img, (2, 0, 1)), dtype=np.float32) / 255.0
 
 def save_img(id, img, raw_img_path):
     out_filename = id + '.png'

@@ -17,7 +17,7 @@ class GANstronomyDataset(data.Dataset):
         img = item['img_pre'] # The preprocessed image
         return [recipe_id, recipe_emb, img_id, img, klass]
 
-    def __len__(self, index):
+    def __len__(self):
         return len(self.ids)
 
     def num_classes(self):

@@ -12,7 +12,7 @@ import lmdb
 import word2vec
 import random
 
-IMAGE_SZ = 128
+IMAGE_SZ = 64
 DATA_ROOT = os.path.abspath('../../data')
 KEY_PATH = os.path.join(DATA_ROOT, 'val_keys.pkl') # From val.tar
 CLASS_PATH = os.path.join(DATA_ROOT, 'classes1M.pkl')
