@@ -17,10 +17,10 @@ FloatTensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 LongTensor = torch.cuda.LongTensor if cuda else torch.LongTensor
 
 # OPTIONS
-RUN_ID = 5
+RUN_ID = 7
 IMAGE_SIZE = 64
-BATCH_SIZE = 15
-DATASET_NAME = 'data1000
+BATCH_SIZE = 32
+DATASET_NAME = 'data10000'
 DATA_PATH = os.path.abspath('../temp/%s/data.pkl' % DATASET_NAME)
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
@@ -69,7 +69,7 @@ def print_loss(G_loss, D_loss, iepoch):
     print("Epoch: %d\tG_Loss: %f\tD_Loss: %f" % (iepoch, G_loss, D_loss))
 
 def save_model(G, G_optimizer, D, D_optimizer, iepoch, ibatch, out_path):
-    filename = '_'.join(['model', 'run%d' % RUN_ID, DATASET_NAME, str(iepoch), str(ibatch)]) + '.pt"
+    filename = '_'.join(['model', 'run%d' % RUN_ID, DATASET_NAME, str(iepoch), str(ibatch)]) + '.pt'
     out_path = os.path.abspath(out_path)
     torch.save({
             'iepoch': iepoch,
@@ -82,7 +82,7 @@ def save_model(G, G_optimizer, D, D_optimizer, iepoch, ibatch, out_path):
 
 def main():
     # Load the data
-    data = GANstronomyDataset(DATA_PATH, split=[0.6, 0.2, 0.2])
+    data = GANstronomyDataset(DATA_PATH, split=[0.95, 0.025, 0.025])
     data.set_split_index(0)
     data_loader = torch.utils.data.DataLoader(data,
                                               batch_size=BATCH_SIZE,
@@ -92,7 +92,8 @@ def main():
     # Make the output directory
     util.create_dir(RUN_PATH)
     util.create_dir(IMG_OUT_PATH)
-
+    util.create_dir(MODEL_OUT_PATH)
+    
     # Instantiate the models
     G = Generator(EMBED_SIZE, num_classes).to(device)
     G_optimizer = torch.optim.Adam(G.parameters(), lr=ADAM_LR, betas=ADAM_B)

@@ -33,7 +33,10 @@ def gen_dataset(N, data_path, compute_embed=True):
     print('Filling in everything except embeddings...')
     dataset = {}
     classes = {} # Maps raw class to the smallest number needed
-    for recipe_id in recipe_ids:
+    error_recipe_ids = []
+    for i, recipe_id in enumerate(recipe_ids):
+        if i % 100 == 0:
+            print('Filling in entry %d/%d...' % (i, N))
         sample = {}
         sample['recipe_id'] = recipe_id.decode('utf-8')
         sample['img_id'] = recipe2img_id[recipe_id][-1]
@@ -41,10 +44,15 @@ def gen_dataset(N, data_path, compute_embed=True):
         if sample['class_raw'] not in classes:
             classes[sample['class_raw']] = len(classes)
         sample['class'] = classes[sample['class_raw']]
-        img = util.resize_crop_img(util.get_img_path(sample['img_id'], util.RAW_IMG_PATH))
-        save_img(sample['img_id'], img, raw_img_path)
-        sample['img_pre'] = preprocess_img(img)
-        dataset[recipe_id.decode('utf-8')] = sample
+        try:
+            img = util.resize_crop_img(util.get_img_path(sample['img_id'], util.RAW_IMG_PATH))
+            save_img(sample['img_id'], img, raw_img_path)
+            sample['img_pre'] = preprocess_img(img)
+            dataset[recipe_id.decode('utf-8')] = sample
+        except FileNotFoundError:
+            print('Could not find image with id %s. Skipping' % sample['img_id'])
+            error_recipe_ids.append(sample['recipe_id'])
+    
     # Hacky business to compute embeddings
     if not compute_embed:
         print('Skipping embeddings...')
@@ -63,8 +71,8 @@ def gen_dataset(N, data_path, compute_embed=True):
         embeddings = util.unpickle2(os.path.join(data_path, 'rec_embeds.pkl'))
         embedding_ids = util.unpickle2(os.path.join(data_path, 'rec_ids.pkl'))
         for i, embedding_id in enumerate(embedding_ids):
-            assert embedding_id in dataset
-            dataset[embedding_id]['recipe_emb'] = embeddings[i]
+            if embedding_id in dataset:
+                dataset[embedding_id]['recipe_emb'] = embeddings[i]
     print('Saving dataset...')
     util.repickle({'data': dataset, 'class_mapping': classes}, os.path.join(data_path, 'data.pkl'))
     print('...done!')
