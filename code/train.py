@@ -41,12 +41,12 @@ def get_img_gen(data, split_index, G, iepoch, out_path):
     data_batch = next(iter(data_loader))
     with torch.no_grad():
         recipe_ids, recipe_embs, img_ids, imgs, classes = data_batch
-        batch_size, recipe_embs, imgs, classes, classes_one_hot = get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes)
+        batch_size, recipe_embs, imgs, classes, classes_one_hot = get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, data.num_classes())
         imgs_gen = G(recipe_embs, classes_one_hot)
         save_img(imgs_gen[0], iepoch, out_path, split_index)
     data.set_split_index(old_split_index)
 
-def get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes):
+def get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, num_classes):
     # Set up Variables
     batch_size = imgs.shape[0]
     recipe_embs = Variable(recipe_embs.type(FloatTensor)).to(device)
@@ -92,7 +92,7 @@ def main():
             # imgs is [batch_size, IMAGE_SIZE, IMAGE_SIZE, 3]
             recipe_ids, recipe_embs, img_ids, imgs, classes = data_batch
 
-            batch_size, recipe_embs, imgs, classes, classes_one_hot = get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes)
+            batch_size, recipe_embs, imgs, classes, classes_one_hot = get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, num_classes)
 
             # Adversarial ground truths
             all_real = Variable(FloatTensor(batch_size, 1).fill_(1.0), requires_grad=False).to(device)
@@ -119,9 +119,9 @@ def main():
                 print_loss(G_loss, D_loss, iepoch)
             if iepoch % INTV_SAVE_IMG == 0 and not ibatch:
                 # Save a training image
-                get_img_gen(data, 0, G, iepoch, out_path)
+                get_img_gen(data, 0, G, iepoch, IMG_OUT_PATH)
                 # Save a validation image
-                get_img_gen(data, 1, G, iepoch, out_path)
+                get_img_gen(data, 1, G, iepoch, IMG_OUT_PATH)
 
 if __name__ == '__main__':
     main()
