@@ -2,3 +2,5 @@ data_raw
 *.pyc
 *~
 temp
+#*#
+.#*
