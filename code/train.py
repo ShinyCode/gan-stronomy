@@ -17,19 +17,19 @@ FloatTensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 LongTensor = torch.cuda.LongTensor if cuda else torch.LongTensor
 
 # OPTIONS
-RUN_ID = 1
+RUN_ID = 2
 IMAGE_SIZE = 64
 BATCH_SIZE = 1
 DATA_PATH = os.path.abspath('../temp/data1/data.pkl')
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
-NUM_EPOCHS = 10
+NUM_EPOCHS = 10000
 CRITERION = torch.nn.BCELoss()
 EMBED_SIZE = 1024
 ADAM_LR = 0.001
 ADAM_B = (0.9, 0.999)
-INTV_PRINT_LOSS = 1 # How often to print the loss, in epochs
-INTV_SAVE_IMG = 1 # How often to save the image, in epochs
+INTV_PRINT_LOSS = 100 # How often to print the loss, in epochs
+INTV_SAVE_IMG = 100 # How often to save the image, in epochs
 
 # img_gen is [3, 64, 64]
 #
