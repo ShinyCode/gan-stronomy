@@ -17,13 +17,13 @@ FloatTensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 LongTensor = torch.cuda.LongTensor if cuda else torch.LongTensor
 
 # OPTIONS
-RUN_ID = 0
+RUN_ID = 1
 IMAGE_SIZE = 64
-BATCH_SIZE = 16
+BATCH_SIZE = 1
 DATA_PATH = os.path.abspath('../temp/data1/data.pkl')
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
-NUM_EPOCHS = 1
+NUM_EPOCHS = 10
 CRITERION = torch.nn.BCELoss()
 EMBED_SIZE = 1024
 ADAM_LR = 0.001
