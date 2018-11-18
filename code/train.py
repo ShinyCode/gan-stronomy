@@ -7,6 +7,7 @@ import torch.utils.data
 from dataset import GANstronomyDataset
 import os
 from model import Generator, Discriminator
+from PIL import Image
 
 cuda = torch.cuda.is_available()
 device = 'cuda' if cuda else 'cpu'
@@ -14,14 +15,31 @@ FloatTensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 LongTensor = torch.cuda.LongTensor if cuda else torch.LongTensor
 
 # OPTIONS
+RUN_ID = 0
 IMAGE_SIZE = 64
 BATCH_SIZE = 16
 DATA_PATH = os.path.abspath('../temp/data100/data.pkl')
+RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
+IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
 NUM_EPOCHS = 1
 CRITERION = torch.nn.BCELoss()
 EMBED_SIZE = 1024
 ADAM_LR = 0.001
 ADAM_B = (0.9, 0.999)
+INTV_PRINT_LOSS = 1 # How often to print the loss, in epochs
+INTV_SAVE_IMG = 1 # How often to save the image, in epochs
+
+# img_gen is [3, 64, 64]
+#
+def save_img(img_gen, iepoch, out_path):
+    out_path = os.path.abspath(out_path)
+    img = np.transpose(np.array(255.0 * img_gen, dtype=np.uint8), (1, 2, 0))
+    img_png = Image.fromarray(img, mode='RGB')
+    filename = str(iepoch) + '.png'
+    img_png.save(os.path.join(out_path, filename), format=PNG)
+
+def print_loss(G_loss, D_loss, iepoch):
+    print("Epoch: %d\tG_Loss: %f\tD_Loss: %f", (iepoch, G_loss, D_loss))
 
 def main():
     # Load the data
@@ -58,6 +76,7 @@ def main():
             # Train Generator
             G_optimizer.zero_grad()
             imgs_gen = G(recipe_embs, classes_one_hot)
+
             fake_probs = D(imgs_gen, classes_one_hot) # TODO: maybe use MSE loss to condition generator
             G_loss = CRITERION(fake_probs, all_real)
             G_loss.backward()
@@ -70,6 +89,11 @@ def main():
             D_loss = (CRITERION(fake_probs, all_fake) + CRITERION(real_probs, all_real)) / 2
             D_loss.backward()
             D_optimizer.step()
+
+            if iepoch % INTV_PRINT_LOSS == 0 and not ibatch:
+                print_loss(G_loss, D_loss, iepoch)
+            if iepoch % INTV_SAVE_IMG == 0 and not ibatch:
+                save_img(imgs_gen[0], iepoch, IMG_OUT_PATH)
 
 
 if __name__ == '__main__':
