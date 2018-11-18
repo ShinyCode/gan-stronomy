@@ -17,10 +17,10 @@ FloatTensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 LongTensor = torch.cuda.LongTensor if cuda else torch.LongTensor
 
 # OPTIONS
-RUN_ID = 4
+RUN_ID = 5
 IMAGE_SIZE = 64
 BATCH_SIZE = 15
-DATA_PATH = os.path.abspath('../temp/data100/data.pkl')
+DATA_PATH = os.path.abspath('../temp/data1000/data.pkl')
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
 NUM_EPOCHS = 1000
@@ -29,8 +29,8 @@ LOSS_MSE = torch.nn.MSELoss()
 EMBED_SIZE = 1024
 ADAM_LR = 0.001
 ADAM_B = (0.9, 0.999)
-INTV_PRINT_LOSS = 10 # How often to print the loss, in epochs
-INTV_SAVE_IMG = 10 # How often to save the image, in epochs
+INTV_PRINT_LOSS = 25 # How often to print the loss, in epochs
+INTV_SAVE_IMG = 25 # How often to save the image, in epochs
 ALPHA = 0.0004
 SPLIT_LABELS = ['train', 'val', 'test']
 
@@ -43,7 +43,7 @@ def get_img_gen(data, split_index, G, iepoch, out_path):
         recipe_ids, recipe_embs, img_ids, imgs, classes = data_batch
         batch_size, recipe_embs, imgs, classes, classes_one_hot = get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, data.num_classes())
         imgs_gen = G(recipe_embs, classes_one_hot)
-        save_img(imgs_gen[0], iepoch, out_path, split_index)
+        save_img(imgs_gen[0], iepoch, out_path, split_index, recipe_ids[0], img_ids[0])
     data.set_split_index(old_split_index)
 
 def get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, num_classes):
@@ -56,11 +56,11 @@ def get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, num_classes):
     return batch_size, recipe_embs, imgs, classes, classes_one_hot
 
 # img_gen is [3, 64, 64]
-def save_img(img_gen, iepoch, out_path, split_index):
+def save_img(img_gen, iepoch, out_path, split_index, recipe_id, img_id):
     out_path = os.path.abspath(out_path)
     img = np.transpose(np.array(255.0 * img_gen, dtype=np.uint8), (1, 2, 0))
     img_png = Image.fromarray(img, mode='RGB')
-    filename = SPLIT_LABELS[split_index] + str(iepoch) + '.png'
+    filename = '_'.join([SPLIT_LABELS[split_index], str(iepoch), recipe_id, img_id]) + '.png'
     img_png.save(os.path.join(out_path, filename), format='PNG')
 
 def print_loss(G_loss, D_loss, iepoch):
