@@ -10,31 +10,11 @@ import os
 from model import Generator, Discriminator
 from PIL import Image
 import numpy as np
+import opts
+from opts import FloatTensor, LongTensor
 
-cuda = torch.cuda.is_available()
-device = 'cuda' if cuda else 'cpu'
-FloatTensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
-LongTensor = torch.cuda.LongTensor if cuda else torch.LongTensor
-
-# OPTIONS
-RUN_ID = 7
-IMAGE_SIZE = 64
-BATCH_SIZE = 32
-DATASET_NAME = 'data10000'
-DATA_PATH = os.path.abspath('../temp/%s/data.pkl' % DATASET_NAME)
-RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
-IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
-MODEL_OUT_PATH = os.path.join(RUN_PATH, 'models')
-NUM_EPOCHS = 1000
-LOSS_BCE = torch.nn.BCELoss()
-LOSS_MSE = torch.nn.MSELoss()
-EMBED_SIZE = 1024
-ADAM_LR = 0.001
-ADAM_B = (0.9, 0.999)
-INTV_PRINT_LOSS = 25 # How often to print the loss, in epochs
-INTV_SAVE_IMG = 25 # How often to save the image, in epochs
-ALPHA = 0.0004
-SPLIT_LABELS = ['train', 'val', 'test']
+BCELoss = torch.nn.BCELoss()
+MSELoss = torch.nn.MSELoss()
 
 def get_img_gen(data, split_index, G, iepoch, out_path):
     old_split_index = data.split_index
@@ -51,10 +31,10 @@ def get_img_gen(data, split_index, G, iepoch, out_path):
 def get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, num_classes):
     # Set up Variables
     batch_size = imgs.shape[0]
-    recipe_embs = Variable(recipe_embs.type(FloatTensor)).to(device)
-    imgs = Variable(imgs.type(FloatTensor)).to(device)
-    classes = Variable(classes.type(LongTensor)).to(device)
-    classes_one_hot = Variable(FloatTensor(batch_size, num_classes).zero_().scatter_(1, classes.view(-1, 1), 1)).to(device)
+    recipe_embs = Variable(recipe_embs.type(FloatTensor)).to(opts.DEVICE)
+    imgs = Variable(imgs.type(FloatTensor)).to(opts.DEVICE)
+    classes = Variable(classes.type(LongTensor)).to(opts.DEVICE)
+    classes_one_hot = Variable(FloatTensor(batch_size, num_classes).zero_().scatter_(1, classes.view(-1, 1), 1)).to(opts.DEVICE)
     return batch_size, recipe_embs, imgs, classes, classes_one_hot
 
 # img_gen is [3, 64, 64]
@@ -62,14 +42,14 @@ def save_img(img_gen, iepoch, out_path, split_index, recipe_id, img_id):
     out_path = os.path.abspath(out_path)
     img = np.transpose(np.array(255.0 * img_gen, dtype=np.uint8), (1, 2, 0))
     img_png = Image.fromarray(img, mode='RGB')
-    filename = '_'.join([SPLIT_LABELS[split_index], str(iepoch), recipe_id, img_id]) + '.png'
+    filename = '_'.join([opts.TVT_SPLIT_LABELS[split_index], str(iepoch), recipe_id, img_id]) + '.png'
     img_png.save(os.path.join(out_path, filename), format='PNG')
 
 def print_loss(G_loss, D_loss, iepoch):
     print("Epoch: %d\tG_Loss: %f\tD_Loss: %f" % (iepoch, G_loss, D_loss))
 
 def save_model(G, G_optimizer, D, D_optimizer, iepoch, ibatch, out_path):
-    filename = '_'.join(['model', 'run%d' % RUN_ID, DATASET_NAME, str(iepoch), str(ibatch)]) + '.pt'
+    filename = '_'.join(['model', 'run%d' % opts.RUN_ID, opts.DATASET_NAME, str(iepoch), str(ibatch)]) + '.pt'
     out_path = os.path.abspath(out_path)
     torch.save({
             'iepoch': iepoch,
@@ -82,26 +62,26 @@ def save_model(G, G_optimizer, D, D_optimizer, iepoch, ibatch, out_path):
 
 def main():
     # Load the data
-    data = GANstronomyDataset(DATA_PATH, split=[0.95, 0.025, 0.025])
+    data = GANstronomyDataset(opts.DATA_PATH, split=opts.TVT_SPLIT)
     data.set_split_index(0)
     data_loader = torch.utils.data.DataLoader(data,
-                                              batch_size=BATCH_SIZE,
+                                              batch_size=opts.BATCH_SIZE,
                                               shuffle=True)
     num_classes = data.num_classes()
 
     # Make the output directory
-    util.create_dir(RUN_PATH)
-    util.create_dir(IMG_OUT_PATH)
-    util.create_dir(MODEL_OUT_PATH)
+    util.create_dir(opts.RUN_PATH)
+    util.create_dir(opts.IMG_OUT_PATH)
+    util.create_dir(opts.MODEL_OUT_PATH)
     
     # Instantiate the models
-    G = Generator(EMBED_SIZE, num_classes).to(device)
-    G_optimizer = torch.optim.Adam(G.parameters(), lr=ADAM_LR, betas=ADAM_B)
+    G = Generator(opts.EMBED_SIZE, num_classes).to(opts.DEVICE)
+    G_optimizer = torch.optim.Adam(G.parameters(), lr=opts.ADAM_LR, betas=opts.ADAM_B)
 
-    D = Discriminator(num_classes).to(device)
-    D_optimizer = torch.optim.Adam(D.parameters(), lr=ADAM_LR, betas=ADAM_B)
+    D = Discriminator(num_classes).to(opts.DEVICE)
+    D_optimizer = torch.optim.Adam(D.parameters(), lr=opts.ADAM_LR, betas=opts.ADAM_B)
 
-    for iepoch in range(NUM_EPOCHS):
+    for iepoch in range(opts.NUM_EPOCHS):
         for ibatch, data_batch in enumerate(data_loader):
             # recipe_embs is [batch_size, EMBED_SIZE]
             # imgs is [batch_size, IMAGE_SIZE, IMAGE_SIZE, 3]
@@ -110,15 +90,15 @@ def main():
             batch_size, recipe_embs, imgs, classes, classes_one_hot = get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, num_classes)
 
             # Adversarial ground truths
-            all_real = Variable(FloatTensor(batch_size, 1).fill_(1.0), requires_grad=False).to(device)
-            all_fake = Variable(FloatTensor(batch_size, 1).fill_(0.0), requires_grad=False).to(device)
+            all_real = Variable(FloatTensor(batch_size, 1).fill_(1.0), requires_grad=False).to(opts.DEVICE)
+            all_fake = Variable(FloatTensor(batch_size, 1).fill_(0.0), requires_grad=False).to(opts.DEVICE)
 
             # Train Generator
             G_optimizer.zero_grad()
             imgs_gen = G(recipe_embs, classes_one_hot)
 
             fake_probs = D(imgs_gen, classes_one_hot) # TODO: maybe use MSE loss to condition generator
-            G_loss = ALPHA * LOSS_BCE(fake_probs, all_real) + LOSS_MSE(imgs_gen, imgs)
+            G_loss = opts.ALPHA * BCELoss(fake_probs, all_real) + MSELoss(imgs_gen, imgs)
             G_loss.backward()
             G_optimizer.step()
 
@@ -126,19 +106,19 @@ def main():
             D_optimizer.zero_grad()
             fake_probs = D(imgs_gen.detach(), classes_one_hot)
             real_probs = D(imgs, classes_one_hot)
-            D_loss = (LOSS_BCE(fake_probs, all_fake) + LOSS_BCE(real_probs, all_real)) / 2
+            D_loss = (BCELoss(fake_probs, all_fake) + BCELoss(real_probs, all_real)) / 2
             D_loss.backward()
             D_optimizer.step()
 
-            if iepoch % INTV_PRINT_LOSS == 0 and not ibatch:
+            if iepoch % opts.INTV_PRINT_LOSS == 0 and not ibatch:
                 print_loss(G_loss, D_loss, iepoch)
-            if iepoch % INTV_SAVE_IMG == 0 and not ibatch:
+            if iepoch % opts.INTV_SAVE_IMG == 0 and not ibatch:
                 # Save a training image
-                get_img_gen(data, 0, G, iepoch, IMG_OUT_PATH)
+                get_img_gen(data, 0, G, iepoch, opts.IMG_OUT_PATH)
                 # Save a validation image
-                get_img_gen(data, 1, G, iepoch, IMG_OUT_PATH)
+                get_img_gen(data, 1, G, iepoch, opts.IMG_OUT_PATH)
 
-    save_model(G, G_optimizer, D, D_optimizer, 'x', 'x', MODEL_OUT_PATH)
+    save_model(G, G_optimizer, D, D_optimizer, 'x', 'x', opts.MODEL_OUT_PATH)
 
 if __name__ == '__main__':
     main()
