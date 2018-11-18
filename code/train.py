@@ -32,15 +32,35 @@ ADAM_B = (0.9, 0.999)
 INTV_PRINT_LOSS = 10 # How often to print the loss, in epochs
 INTV_SAVE_IMG = 10 # How often to save the image, in epochs
 ALPHA = 0.0004
+SPLIT_LABELS = ['train', 'val', 'test']
+
+def get_img_gen(data, split_index, G, iepoch, out_path):
+    old_split_index = data.split_index
+    data.set_split_index(split_index)
+    data_loader = torch.utils.data.DataLoader(data, batch_size=1, shuffle=False)
+    data_batch = next(iter(data_loader))
+    with torch.no_grad():
+        recipe_ids, recipe_embs, img_ids, imgs, classes = data_batch
+        batch_size, recipe_embs, imgs, classes, classes_one_hot = get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes)
+        imgs_gen = G(recipe_embs, classes_one_hot)
+        save_img(imgs_gen[0], iepoch, out_path, split_index)
+    data.set_split_index(old_split_index)
+
+def get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes):
+    # Set up Variables
+    batch_size = imgs.shape[0]
+    recipe_embs = Variable(recipe_embs.type(FloatTensor)).to(device)
+    imgs = Variable(imgs.type(FloatTensor)).to(device)
+    classes = Variable(classes.type(LongTensor)).to(device)
+    classes_one_hot = Variable(FloatTensor(batch_size, num_classes).zero_().scatter_(1, classes.view(-1, 1), 1)).to(device)
+    return batch_size, recipe_embs, imgs, classes, classes_one_hot
 
 # img_gen is [3, 64, 64]
-#
-
-def save_img(img_gen, iepoch, out_path):
+def save_img(img_gen, iepoch, out_path, split_index):
     out_path = os.path.abspath(out_path)
     img = np.transpose(np.array(255.0 * img_gen, dtype=np.uint8), (1, 2, 0))
     img_png = Image.fromarray(img, mode='RGB')
-    filename = str(iepoch) + '.png'
+    filename = SPLIT_LABELS[split_index] + str(iepoch) + '.png'
     img_png.save(os.path.join(out_path, filename), format='PNG')
 
 def print_loss(G_loss, D_loss, iepoch):
@@ -58,7 +78,7 @@ def main():
     # Make the output directory
     util.create_dir(RUN_PATH)
     util.create_dir(IMG_OUT_PATH)
-    
+
     # Instantiate the models
     G = Generator(EMBED_SIZE, num_classes).to(device)
     G_optimizer = torch.optim.Adam(G.parameters(), lr=ADAM_LR, betas=ADAM_B)
@@ -72,12 +92,7 @@ def main():
             # imgs is [batch_size, IMAGE_SIZE, IMAGE_SIZE, 3]
             recipe_ids, recipe_embs, img_ids, imgs, classes = data_batch
 
-            # Set up Variables
-            batch_size = imgs.shape[0]
-            recipe_embs = Variable(recipe_embs.type(FloatTensor)).to(device)
-            imgs = Variable(imgs.type(FloatTensor)).to(device)
-            classes = Variable(classes.type(LongTensor)).to(device)
-            classes_one_hot = Variable(FloatTensor(batch_size, num_classes).zero_().scatter_(1, classes.view(-1, 1), 1)).to(device)
+            batch_size, recipe_embs, imgs, classes, classes_one_hot = get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes)
 
             # Adversarial ground truths
             all_real = Variable(FloatTensor(batch_size, 1).fill_(1.0), requires_grad=False).to(device)
@@ -104,16 +119,9 @@ def main():
                 print_loss(G_loss, D_loss, iepoch)
             if iepoch % INTV_SAVE_IMG == 0 and not ibatch:
                 # Save a training image
-                data.set_split_index(0)
-                
-                save_img(img_gen, iepoch, IMG_OUT_PATH)
-
+                get_img_gen(data, 0, G, iepoch, out_path)
                 # Save a validation image
-                data.set_split_index(1)
-
-            # CHANGE THE SPLIT BACK TO TRAINING
-            data.set_split_index(0)
-
+                get_img_gen(data, 1, G, iepoch, out_path)
 
 if __name__ == '__main__':
     main()
