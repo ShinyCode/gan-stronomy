@@ -17,10 +17,10 @@ FloatTensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 LongTensor = torch.cuda.LongTensor if cuda else torch.LongTensor
 
 # OPTIONS
-RUN_ID = 3
+RUN_ID = 4
 IMAGE_SIZE = 64
-BATCH_SIZE = 1
-DATA_PATH = os.path.abspath('../temp/data1/data.pkl')
+BATCH_SIZE = 15
+DATA_PATH = os.path.abspath('../temp/data100/data.pkl')
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
 NUM_EPOCHS = 1000
@@ -29,12 +29,13 @@ LOSS_MSE = torch.nn.MSELoss()
 EMBED_SIZE = 1024
 ADAM_LR = 0.001
 ADAM_B = (0.9, 0.999)
-INTV_PRINT_LOSS = 100 # How often to print the loss, in epochs
-INTV_SAVE_IMG = 100 # How often to save the image, in epochs
+INTV_PRINT_LOSS = 10 # How often to print the loss, in epochs
+INTV_SAVE_IMG = 10 # How often to save the image, in epochs
 ALPHA = 0.0004
 
 # img_gen is [3, 64, 64]
 #
+
 def save_img(img_gen, iepoch, out_path):
     out_path = os.path.abspath(out_path)
     img = np.transpose(np.array(255.0 * img_gen, dtype=np.uint8), (1, 2, 0))
@@ -47,7 +48,8 @@ def print_loss(G_loss, D_loss, iepoch):
 
 def main():
     # Load the data
-    data = GANstronomyDataset(DATA_PATH)
+    data = GANstronomyDataset(DATA_PATH, split=[0.6, 0.2, 0.2])
+    data.set_split_index(0)
     data_loader = torch.utils.data.DataLoader(data,
                                               batch_size=BATCH_SIZE,
                                               shuffle=True)
@@ -101,8 +103,16 @@ def main():
             if iepoch % INTV_PRINT_LOSS == 0 and not ibatch:
                 print_loss(G_loss, D_loss, iepoch)
             if iepoch % INTV_SAVE_IMG == 0 and not ibatch:
-                img_gen = imgs_gen[0].detach()
+                # Save a training image
+                data.set_split_index(0)
+                
                 save_img(img_gen, iepoch, IMG_OUT_PATH)
+
+                # Save a validation image
+                data.set_split_index(1)
+
+            # CHANGE THE SPLIT BACK TO TRAINING
+            data.set_split_index(0)
 
 
 if __name__ == '__main__':
