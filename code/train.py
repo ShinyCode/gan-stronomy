@@ -20,9 +20,11 @@ LongTensor = torch.cuda.LongTensor if cuda else torch.LongTensor
 RUN_ID = 5
 IMAGE_SIZE = 64
 BATCH_SIZE = 15
-DATA_PATH = os.path.abspath('../temp/data1000/data.pkl')
+DATASET_NAME = 'data1000
+DATA_PATH = os.path.abspath('../temp/%s/data.pkl' % DATASET_NAME)
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
+MODEL_OUT_PATH = os.path.join(RUN_PATH, 'models')
 NUM_EPOCHS = 1000
 LOSS_BCE = torch.nn.BCELoss()
 LOSS_MSE = torch.nn.MSELoss()
@@ -65,6 +67,18 @@ def save_img(img_gen, iepoch, out_path, split_index, recipe_id, img_id):
 
 def print_loss(G_loss, D_loss, iepoch):
     print("Epoch: %d\tG_Loss: %f\tD_Loss: %f" % (iepoch, G_loss, D_loss))
+
+def save_model(G, G_optimizer, D, D_optimizer, iepoch, ibatch, out_path):
+    filename = '_'.join(['model', 'run%d' % RUN_ID, DATASET_NAME, str(iepoch), str(ibatch)]) + '.pt"
+    out_path = os.path.abspath(out_path)
+    torch.save({
+            'iepoch': iepoch,
+            'ibatch': ibatch,
+            'G_state_dict': G.state_dict(),
+            'G_optimizer_state_dict': G_optimizer.state_dict(),
+            'D_state_dict': D.state_dict(),
+            'D_optimizer_state_dict': D_optimizer.state_dict()
+            }, os.path.join(out_path, filename))
 
 def main():
     # Load the data
@@ -122,6 +136,8 @@ def main():
                 get_img_gen(data, 0, G, iepoch, IMG_OUT_PATH)
                 # Save a validation image
                 get_img_gen(data, 1, G, iepoch, IMG_OUT_PATH)
+
+    save_model(G, G_optimizer, D, D_optimizer, 'x', 'x', MODEL_OUT_PATH)
 
 if __name__ == '__main__':
     main()
