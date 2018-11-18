@@ -17,19 +17,21 @@ FloatTensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 LongTensor = torch.cuda.LongTensor if cuda else torch.LongTensor
 
 # OPTIONS
-RUN_ID = 2
+RUN_ID = 3
 IMAGE_SIZE = 64
 BATCH_SIZE = 1
 DATA_PATH = os.path.abspath('../temp/data1/data.pkl')
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
-NUM_EPOCHS = 10000
-CRITERION = torch.nn.BCELoss()
+NUM_EPOCHS = 1000
+LOSS_BCE = torch.nn.BCELoss()
+LOSS_MSE = torch.nn.MSELoss()
 EMBED_SIZE = 1024
 ADAM_LR = 0.001
 ADAM_B = (0.9, 0.999)
 INTV_PRINT_LOSS = 100 # How often to print the loss, in epochs
 INTV_SAVE_IMG = 100 # How often to save the image, in epochs
+ALPHA = 0.0004
 
 # img_gen is [3, 64, 64]
 #
@@ -84,7 +86,7 @@ def main():
             imgs_gen = G(recipe_embs, classes_one_hot)
 
             fake_probs = D(imgs_gen, classes_one_hot) # TODO: maybe use MSE loss to condition generator
-            G_loss = CRITERION(fake_probs, all_real)
+            G_loss = ALPHA * LOSS_BCE(fake_probs, all_real) + LOSS_MSE(imgs_gen, imgs)
             G_loss.backward()
             G_optimizer.step()
 
@@ -92,7 +94,7 @@ def main():
             D_optimizer.zero_grad()
             fake_probs = D(imgs_gen.detach(), classes_one_hot)
             real_probs = D(imgs, classes_one_hot)
-            D_loss = (CRITERION(fake_probs, all_fake) + CRITERION(real_probs, all_real)) / 2
+            D_loss = (LOSS_BCE(fake_probs, all_fake) + LOSS_BCE(real_probs, all_real)) / 2
             D_loss.backward()
             D_optimizer.step()
 
