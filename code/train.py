@@ -75,6 +75,11 @@ def main():
             # imgs is [batch_size, IMAGE_SIZE, IMAGE_SIZE, 3]
             recipe_ids, recipe_embs, img_ids, imgs, classes = data_batch
 
+            # Make sure we're not training on validation or test data!
+            if opts.SAFETY_MODE:
+                for recipe_id in recipe_ids:
+                    assert data.get_recipe_split_index(recipe_id) == 0
+
             batch_size, recipe_embs, imgs, classes, classes_one_hot = util.get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, num_classes)
 
             # Adversarial ground truths

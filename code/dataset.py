@@ -13,7 +13,11 @@ class GANstronomyDataset(data.Dataset):
         self.split = np.array(split) / np.sum(split)
         self.split_sizes = np.floor(self.split * len(self.ids))
         self.split_index = 0
-        self.split_starts = np.insert(np.cumsum(self.split_sizes)[:-1], 0, [0])
+        self.split_starts = np.insert(np.cumsum(self.split_sizes), 0, [0])
+        self.split_starts = [int(split_start) for split_start in self.split_starts]
+        self.id_sets = []
+        for i in range(len(self.split_sizes) - 1):
+            self.id_sets.append(set(self.ids[self.split_starts[i]:self.split_starts[i+1]]))
         
     def __getitem__(self, index):
         item = self.data[self.ids[self.get_real_index(index)]]
@@ -34,4 +38,13 @@ class GANstronomyDataset(data.Dataset):
         self.split_index = index
 
     def get_real_index(self, index):
-        return int(self.split_starts[self.split_index]) + index
+        real_index = self.split_starts[self.split_index] + index
+        if real_index < self.split_starts[self.split_index] or real_index >= self.split_starts[self.split_index + 1]:
+            raise ValueError('real_index %d out of bounds for split %d!' % (real_index, self.split_index))
+        return real_index
+
+    def get_recipe_split_index(self, recipe_id):
+        for i, id_set in enumerate(self.id_sets):
+            if recipe_id in id_set:
+                return i
+        return None
