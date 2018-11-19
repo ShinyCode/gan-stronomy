@@ -11,6 +11,9 @@ import json
 import lmdb
 import word2vec
 import random
+import opts
+from opts import FloatTensor, LongTensor
+from torch.autograd import Variable
 
 IMAGE_SZ = 64
 DATA_ROOT = os.path.abspath('../../data')
@@ -165,3 +168,12 @@ def create_dir(dir_path):
         os.stat(dir_path)
     except:
         os.mkdir(dir_path)
+
+def get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, num_classes):
+    # Set up Variables
+    batch_size = imgs.shape[0]
+    recipe_embs = Variable(recipe_embs.type(FloatTensor)).to(opts.DEVICE)
+    imgs = Variable(imgs.type(FloatTensor)).to(opts.DEVICE)
+    classes = Variable(classes.type(LongTensor)).to(opts.DEVICE)
+    classes_one_hot = Variable(FloatTensor(batch_size, num_classes).zero_().scatter_(1, classes.view(-1, 1), 1)).to(opts.DEVICE)
+    return batch_size, recipe_embs, imgs, classes, classes_one_hot

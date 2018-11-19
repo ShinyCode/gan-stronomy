@@ -7,6 +7,9 @@ from model import Generator, Discriminator
 import opts
 from torch.utils.data import DataLoader
 
+def save_results(img, img_gen, recipe_id):
+    print(recipe_id)
+
 def main():
     if len(sys.argv) < 5:
         print('Usage: python3 test.py [MODEL_PATH] [DATA_PATH] [SPLIT_INDEX] [OUT_PATH]')
@@ -30,9 +33,11 @@ def main():
     for ibatch, data_batch in enumerate(data_loader):
         with torch.no_grad():
             recipe_ids, recipe_embs, img_ids, imgs, classes = data_batch
-            batch_size, recipe_embs, imgs, classes, classes_one_hot = None
-
-    
+            batch_size, recipe_embs, imgs, classes, classes_one_hot = util.get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, num_classes)
+            imgs_gen = G(recipe_embs, classes_one_hot)
+            imgs, imgs_gen = imgs.detach(), imgs_gen.detach()
+            for iexample in range(batch_size):
+                save_results(imgs[iexample], imgs_gen[iexample], recipe_ids[iexample])
 
 if __name__ == '__main__':
     main()

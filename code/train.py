@@ -23,19 +23,10 @@ def get_img_gen(data, split_index, G, iepoch, out_path):
     data_batch = next(iter(data_loader))
     with torch.no_grad():
         recipe_ids, recipe_embs, img_ids, imgs, classes = data_batch
-        batch_size, recipe_embs, imgs, classes, classes_one_hot = get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, data.num_classes())
+        batch_size, recipe_embs, imgs, classes, classes_one_hot = util.get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, data.num_classes())
         imgs_gen = G(recipe_embs, classes_one_hot)
         save_img(imgs_gen[0], iepoch, out_path, split_index, recipe_ids[0], img_ids[0])
     data.set_split_index(old_split_index)
-
-def get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, num_classes):
-    # Set up Variables
-    batch_size = imgs.shape[0]
-    recipe_embs = Variable(recipe_embs.type(FloatTensor)).to(opts.DEVICE)
-    imgs = Variable(imgs.type(FloatTensor)).to(opts.DEVICE)
-    classes = Variable(classes.type(LongTensor)).to(opts.DEVICE)
-    classes_one_hot = Variable(FloatTensor(batch_size, num_classes).zero_().scatter_(1, classes.view(-1, 1), 1)).to(opts.DEVICE)
-    return batch_size, recipe_embs, imgs, classes, classes_one_hot
 
 # img_gen is [3, 64, 64]
 def save_img(img_gen, iepoch, out_path, split_index, recipe_id, img_id):
@@ -73,7 +64,7 @@ def main():
     util.create_dir(opts.RUN_PATH)
     util.create_dir(opts.IMG_OUT_PATH)
     util.create_dir(opts.MODEL_OUT_PATH)
-    
+
     # Instantiate the models
     G = Generator(opts.EMBED_SIZE, num_classes).to(opts.DEVICE)
     G_optimizer = torch.optim.Adam(G.parameters(), lr=opts.ADAM_LR, betas=opts.ADAM_B)
@@ -87,7 +78,7 @@ def main():
             # imgs is [batch_size, IMAGE_SIZE, IMAGE_SIZE, 3]
             recipe_ids, recipe_embs, img_ids, imgs, classes = data_batch
 
-            batch_size, recipe_embs, imgs, classes, classes_one_hot = get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, num_classes)
+            batch_size, recipe_embs, imgs, classes, classes_one_hot = util.get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, num_classes)
 
             # Adversarial ground truths
             all_real = Variable(FloatTensor(batch_size, 1).fill_(1.0), requires_grad=False).to(opts.DEVICE)
