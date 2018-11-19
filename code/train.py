@@ -30,11 +30,8 @@ def get_img_gen(data, split_index, G, iepoch, out_path):
 
 # img_gen is [3, 64, 64]
 def save_img(img_gen, iepoch, out_path, split_index, recipe_id, img_id):
-    out_path = os.path.abspath(out_path)
-    img = np.transpose(np.array(255.0 * img_gen, dtype=np.uint8), (1, 2, 0))
-    img_png = Image.fromarray(img, mode='RGB')
     filename = '_'.join([opts.TVT_SPLIT_LABELS[split_index], str(iepoch), recipe_id, img_id]) + '.png'
-    img_png.save(os.path.join(out_path, filename), format='PNG')
+    util.save_img(img_gen, out_path, filename)
 
 def print_loss(G_loss, D_loss, iepoch):
     print("Epoch: %d\tG_Loss: %f\tD_Loss: %f" % (iepoch, G_loss, D_loss))

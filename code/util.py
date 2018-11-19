@@ -177,3 +177,16 @@ def get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, num_classes):
     classes = Variable(classes.type(LongTensor)).to(opts.DEVICE)
     classes_one_hot = Variable(FloatTensor(batch_size, num_classes).zero_().scatter_(1, classes.view(-1, 1), 1)).to(opts.DEVICE)
     return batch_size, recipe_embs, imgs, classes, classes_one_hot
+
+def save_img(img, out_path, filename):
+    out_path = os.path.abspath(out_path)
+    img = np.transpose(np.array(255.0 * img, dtype=np.uint8), (1, 2, 0))
+    img_png = Image.fromarray(img, mode='RGB')
+    img_png.save(os.path.join(out_path, filename), format='PNG')
+
+def get_valid_ingrs(ingrs, recipe_id):
+    ret = set()
+    for ingr, valid in zip(ingrs[recipe_id]['ingredients'], ingrs[recipe_id]['valid']):
+        if valid:
+            ret.add(ingr['text'])
+    return ret
