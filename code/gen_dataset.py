@@ -4,10 +4,11 @@ import numpy as np
 import subprocess
 import sys
 
-# Squeezes image to [0, 1], and also makes sure it's in [C, H, W] format
+# Squeezes image to [-1, 1], and also makes sure it's in [C, H, W] format
 def preprocess_img(img):
-    return np.array(np.transpose(img, (2, 0, 1)), dtype=np.float32) / 255.0
-
+    img_scale = np.array(np.transpose(img, (2, 0, 1)), dtype=np.float32) / 255.0
+    return img_scale * 2.0 - 1.0
+    
 def save_img(id, img, raw_img_path):
     out_filename = id + '.png'
     img.save(os.path.join(raw_img_path, out_filename), format='PNG')

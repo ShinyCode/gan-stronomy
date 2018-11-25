@@ -178,9 +178,11 @@ def get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, num_classes):
     classes_one_hot = Variable(FloatTensor(batch_size, num_classes).zero_().scatter_(1, classes.view(-1, 1), 1)).to(opts.DEVICE)
     return batch_size, recipe_embs, imgs, classes, classes_one_hot
 
+# Assumes image values are in [-1, 1]
 def save_img(img, out_path, filename):
     out_path = os.path.abspath(out_path)
-    img = np.transpose(np.array(255.0 * img, dtype=np.uint8), (1, 2, 0))
+    img_scale = (img + 1.0) / 2.0
+    img = np.transpose(np.array(255.0 * img_scale, dtype=np.uint8), (1, 2, 0))
     img_png = Image.fromarray(img, mode='RGB')
     img_png.save(os.path.join(out_path, filename), format='PNG')
 
