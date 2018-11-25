@@ -48,6 +48,17 @@ def save_model(G, G_optimizer, D, D_optimizer, iepoch, ibatch, out_path):
             'D_optimizer_state_dict': D_optimizer.state_dict()
             }, os.path.join(out_path, filename))
 
+def load_state_dicts(model_path, G, G_optimizer, D, D_optimizer):
+    model_path = os.path.abspath(model_path)
+    saved_model = torch.load(model_path)
+    G.load_state_dict(saved_model['G_state_dict'])
+    G_optimizer.load_state_dict(saved_model['G_optimizer_state_dict'])
+    D.load_state_dict(saved_model['D_state_dict'])
+    D_optimizer.load_state_dict(saved_model['D_optimizer_state_dict'])
+    iepoch = saved_model['iepoch']
+    ibatch = saved_model['ibatch']
+    return start_iepoch, start_ibatch
+    
 def main():
     # Load the data
     data = GANstronomyDataset(opts.DATA_PATH, split=opts.TVT_SPLIT)
@@ -69,10 +80,20 @@ def main():
     D = Discriminator(num_classes).to(opts.DEVICE)
     D_optimizer = torch.optim.Adam(D.parameters(), lr=opts.ADAM_LR, betas=opts.ADAM_B)
 
+    if opts.MODEL_PATH is None:
+        start_iepoch, start_ibatch = 0, 0
+    else:
+        print('Attempting to resume training using model in %s...' % opts.MODEL_PATH)
+        start_iepoch, start_ibatch = load_state_dicts(opts.MODEL_PATH, G, G_optimizer, D, D_optimizer)
+    
     for iepoch in range(opts.NUM_EPOCHS):
         for ibatch, data_batch in enumerate(data_loader):
-            # recipe_embs is [batch_size, EMBED_SIZE]
-            # imgs is [batch_size, IMAGE_SIZE, IMAGE_SIZE, 3]
+            # To try to resume training, just continue if iepoch and ibatch are less than their starts
+            if iepoch < start_iepoch or (iepoch == start_iepoch and ibatch < start_ibatch):
+                if iepoch % opts.INTV_PRINT_LOSS == 0 and not ibatch:
+                    print('Skipping epoch %d...' % iepoch)
+                continue
+            
             recipe_ids, recipe_embs, img_ids, imgs, classes = data_batch
 
             # Make sure we're not training on validation or test data!

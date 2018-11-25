@@ -30,6 +30,7 @@ ALPHA = 0.0004
 RUN_ID = 10
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
+MODEL_PATH = None # None means starting fresh
 MODEL_OUT_PATH = os.path.join(RUN_PATH, 'models')
 INTV_PRINT_LOSS = 50
 INTV_SAVE_IMG = 50
