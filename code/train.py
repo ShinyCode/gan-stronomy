@@ -73,8 +73,9 @@ def main():
     util.create_dir(opts.IMG_OUT_PATH)
     util.create_dir(opts.MODEL_OUT_PATH)
 
-    # Copy opts.py to opts.RUN_PATH as a record of the parameters
+    # Copy opts.py and model.py to opts.RUN_PATH as a record
     shutil.copy2('opts.py', opts.RUN_PATH)
+    shutil.copy2('model.py', opts.RUN_PATH)
     
     # Instantiate the models
     G = Generator(opts.EMBED_SIZE, num_classes).to(opts.DEVICE)
