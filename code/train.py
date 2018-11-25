@@ -12,6 +12,7 @@ from PIL import Image
 import numpy as np
 import opts
 from opts import FloatTensor, LongTensor
+import shutil
 
 BCELoss = torch.nn.BCELoss()
 MSELoss = torch.nn.MSELoss()
@@ -36,12 +37,11 @@ def save_img(img_gen, iepoch, out_path, split_index, recipe_id, img_id):
 def print_loss(G_loss, D_loss, iepoch):
     print("Epoch: %d\tG_Loss: %f\tD_Loss: %f" % (iepoch, G_loss, D_loss))
 
-def save_model(G, G_optimizer, D, D_optimizer, iepoch, ibatch, out_path):
-    filename = '_'.join(['model', 'run%d' % opts.RUN_ID, opts.DATASET_NAME, str(iepoch), str(ibatch)]) + '.pt'
+def save_model(G, G_optimizer, D, D_optimizer, iepoch, out_path):
+    filename = '_'.join(['model', 'run%d' % opts.RUN_ID, opts.DATASET_NAME, str(iepoch)]) + '.pt'
     out_path = os.path.abspath(out_path)
     torch.save({
             'iepoch': iepoch,
-            'ibatch': ibatch,
             'G_state_dict': G.state_dict(),
             'G_optimizer_state_dict': G_optimizer.state_dict(),
             'D_state_dict': D.state_dict(),
@@ -55,8 +55,8 @@ def load_state_dicts(model_path, G, G_optimizer, D, D_optimizer):
     G_optimizer.load_state_dict(saved_model['G_optimizer_state_dict'])
     D.load_state_dict(saved_model['D_state_dict'])
     D_optimizer.load_state_dict(saved_model['D_optimizer_state_dict'])
-    iepoch = saved_model['iepoch']
-    ibatch = saved_model['ibatch']
+    start_iepoch = saved_model['iepoch']
+    start_ibatch = 1
     return start_iepoch, start_ibatch
     
 def main():
@@ -73,6 +73,9 @@ def main():
     util.create_dir(opts.IMG_OUT_PATH)
     util.create_dir(opts.MODEL_OUT_PATH)
 
+    # Copy opts.py to opts.RUN_PATH as a record of the parameters
+    shutil.copy2('opts.py', opts.RUN_PATH)
+    
     # Instantiate the models
     G = Generator(opts.EMBED_SIZE, num_classes).to(opts.DEVICE)
     G_optimizer = torch.optim.Adam(G.parameters(), lr=opts.ADAM_LR, betas=opts.ADAM_B)
@@ -131,8 +134,11 @@ def main():
                 get_img_gen(data, 0, G, iepoch, opts.IMG_OUT_PATH)
                 # Save a validation image
                 get_img_gen(data, 1, G, iepoch, opts.IMG_OUT_PATH)
+            if iepoch % opts.INTV_SAVE_MODEL == 0 and not ibatch:
+                print('Saving model...')
+                save_model(G, G_optimizer, D, D_optimizer, iepoch, opts.MODEL_OUT_PATH)
 
-    save_model(G, G_optimizer, D, D_optimizer, 'x', 'x', opts.MODEL_OUT_PATH)
+    save_model(G, G_optimizer, D, D_optimizer, 'FINAL', opts.MODEL_OUT_PATH)
 
 if __name__ == '__main__':
     main()
