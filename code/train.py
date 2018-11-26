@@ -116,7 +116,7 @@ def main():
             imgs_gen = G(recipe_embs, classes_one_hot)
 
             fake_probs = D(imgs_gen, classes_one_hot) # TODO: maybe use MSE loss to condition generator
-            G_loss = opts.ALPHA * BCELoss(fake_probs, all_real) + MSELoss(imgs_gen, imgs)
+            G_loss = BCELoss(fake_probs, all_real)
             G_loss.backward()
             G_optimizer.step()
 
