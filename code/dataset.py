@@ -1,6 +1,7 @@
 import torch.utils.data as data
 import util
 import numpy as np
+import random
 
 class GANstronomyDataset(data.Dataset):
     # data = GANstronomyDataset(DATA_PATH, [0.6, 0.2, 0.2])
@@ -9,7 +10,8 @@ class GANstronomyDataset(data.Dataset):
         dataset = util.unpickle(data_path)
         self.data = dataset['data']
         self.class_mapping = dataset['class_mapping']
-        self.ids = list(self.data.keys())
+        self.ids = sorted(list(self.data.keys()))
+        random.Random(0).shuffle(self.ids)
         self.split = np.array(split) / np.sum(split)
         self.split_sizes = np.floor(self.split * len(self.ids))
         self.split_index = 0

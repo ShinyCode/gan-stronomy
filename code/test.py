@@ -4,9 +4,9 @@ from dataset import GANstronomyDataset
 import sys
 import os
 from model import Generator, Discriminator
-import opts
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, SequentialSampler
 import util
+import opts
 
 # [recipe_id]_[img_id]_real.png
 # [recipe_id]_[img_id]_fake.png
@@ -21,7 +21,7 @@ def save_results(all_ingrs, img, img_gen, img_id, recipe_id, out_path):
     with open(os.path.join(out_path, ingr_filename), 'w') as f:
         for ingr in ingrs:
             f.write('%s\n' % ingr)
-    
+            
 def main():
     if len(sys.argv) < 5:
         print('Usage: python3 test.py [MODEL_PATH] [DATA_PATH] [SPLIT_INDEX] [OUT_PATH]')
@@ -36,7 +36,7 @@ def main():
 
     data = GANstronomyDataset(data_path, split=opts.TVT_SPLIT)
     data.set_split_index(split_index)
-    data_loader = DataLoader(data, batch_size=opts.BATCH_SIZE, shuffle=False)
+    data_loader = DataLoader(data, batch_size=opts.BATCH_SIZE, shuffle=False, sampler=SequentialSampler(data))
 
     num_classes = data.num_classes()
     G = Generator(opts.EMBED_SIZE, num_classes).to(opts.DEVICE)

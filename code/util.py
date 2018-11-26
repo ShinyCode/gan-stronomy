@@ -16,6 +16,7 @@ from opts import FloatTensor, LongTensor
 from torch.autograd import Variable
 import time
 import datetime
+import torch
 
 IMAGE_SZ = 64
 DATA_ROOT = os.path.abspath('../../data')
