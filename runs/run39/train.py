@@ -112,11 +112,6 @@ def main():
             all_real = Variable(FloatTensor(batch_size, 1).fill_(1.0), requires_grad=False).to(opts.DEVICE)
             all_fake = Variable(FloatTensor(batch_size, 1).fill_(0.0), requires_grad=False).to(opts.DEVICE)
 
-            noisy_real, noisy_fake = None, None
-            if opts.NOISY_LABELS:
-                noisy_real = Variable(FloatTensor(batch_size, 1).random_(0.9, 1.0), requires_grad=False).to(opts.DEVICE)
-                noisy_fake = Variable(FloatTensor(batch_size, 1).random_(0.0, 0.1), requires_grad=False).to(opts.DEVICE)
-
             # Train Generator
             for _ in range(opts.NUM_UPDATE_G):
                 G_optimizer.zero_grad()
@@ -134,7 +129,7 @@ def main():
                 D_optimizer.zero_grad()
                 fake_probs = D(imgs_gen.detach(), classes_one_hot)
                 real_probs = D(imgs, classes_one_hot)
-                D_loss = (BCELoss(fake_probs, noisy_fake if opts.NOISY_LABELS else all_fake) + BCELoss(real_probs, noisy_real if opts.NOISY_LABELS else all_real)) / 2
+                D_loss = (BCELoss(fake_probs, all_fake) + BCELoss(real_probs, all_real)) / 2
                 D_loss.backward()
                 D_optimizer.step()
 
