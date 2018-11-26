@@ -185,6 +185,11 @@ def get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, num_classes):
     classes_one_hot = Variable(FloatTensor(batch_size, num_classes).zero_().scatter_(1, classes.view(-1, 1), 1)).to(opts.DEVICE)
     return batch_size, recipe_embs, imgs, classes, classes_one_hot
 
+def get_variables2(noisy_real, noisy_fake):
+    noisy_real = Variable(noisy_real.type(FloatTensor), requires_grad=False).to(opts.DEVICE)
+    noisy_fake = Variable(noisy_fake.type(FloatTensor), requires_grad=False).to(opts.DEVICE)
+    return noisy_real[:, None], noisy_fake[:, None]
+    
 # Assumes image values are in [-1, 1]
 def save_img(img, out_path, filename):
     out_path = os.path.abspath(out_path)

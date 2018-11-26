@@ -20,15 +20,21 @@ class GANstronomyDataset(data.Dataset):
         self.id_sets = []
         for i in range(len(self.split_sizes) - 1):
             self.id_sets.append(set(self.ids[self.split_starts[i]:self.split_starts[i+1]]))
+        np.random.seed(0)
+        self.noisy_real = np.random.rand(len(self.ids)) * 0.1 + 0.9
+        self.noisy_fake = np.random.rand(len(self.ids)) * 0.1
         
     def __getitem__(self, index):
-        item = self.data[self.ids[self.get_real_index(index)]]
+        real_index = self.get_real_index(index)
+        item = self.data[self.ids[real_index]]
         recipe_id = item['recipe_id']
         img_id = item['img_id']
         klass = item['class']
         recipe_emb = item['recipe_emb']
         img = item['img_pre'] # The preprocessed image
-        return [recipe_id, recipe_emb, img_id, img, klass]
+        noisy_real = self.noisy_real[real_index]
+        noisy_fake = self.noisy_fake[real_index]
+        return [recipe_id, recipe_emb, img_id, img, klass, noisy_real, noisy_fake]
     
     def __len__(self):
         return int(self.split_sizes[self.split_index])

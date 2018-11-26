@@ -23,7 +23,7 @@ DATASET_NAME = 'data1000'
 DATA_PATH = os.path.abspath('../temp/%s/data.pkl' % DATASET_NAME)
 
 # Training parameters
-BATCH_SIZE = 64
+BATCH_SIZE = 16
 ADAM_LR = 0.0002
 ADAM_B = (0.5, 0.999)
 NUM_EPOCHS = 26
@@ -37,8 +37,8 @@ NDF = 64
 USE_CLASSES = False
 
 # Run parameters
-RUN_ID = 42
-RUN_COMMENT = 'Up the batch size.'
+RUN_ID = 41
+RUN_COMMENT = 'Baking noisy labels into dataset'
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
 # MODEL_PATH = '../runs/run11/models/model_run11_data100_100_0.pt'

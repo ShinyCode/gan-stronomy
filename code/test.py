@@ -47,7 +47,7 @@ def main():
 
     for ibatch, data_batch in enumerate(data_loader):
         with torch.no_grad():
-            recipe_ids, recipe_embs, img_ids, imgs, classes = data_batch
+            recipe_ids, recipe_embs, img_ids, imgs, classes, _, _ = data_batch
             batch_size, recipe_embs, imgs, classes, classes_one_hot = util.get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, num_classes)
             imgs_gen = G(recipe_embs, classes_one_hot)
             imgs, imgs_gen = imgs.detach(), imgs_gen.detach()
