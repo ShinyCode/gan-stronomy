@@ -61,7 +61,5 @@ class Discriminator(nn.Module):
     # x is (m, 128, 128, 3), y is (m, n_classes)
     def forward(self, x, y):
         z = self.main(x).view(-1, 16384)
-        print(z.shape)
-        
         zy = torch.cat((z, y), -1)
         return torch.sigmoid(self.linear(zy))
