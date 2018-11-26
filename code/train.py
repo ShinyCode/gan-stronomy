@@ -114,9 +114,10 @@ def main():
             all_fake = Variable(FloatTensor(batch_size, 1).fill_(0.0), requires_grad=False).to(opts.DEVICE)
 
             # Train Discriminator
+            imgs_gen = G(recipe_embs, classes_one_hot).detach()
             for _ in range(opts.NUM_UPDATE_D):
                 D_optimizer.zero_grad()
-                fake_probs = D(G(recipe_embs, classes_one_hot).detach(), classes_one_hot)
+                fake_probs = D(imgs_gen, classes_one_hot)
                 real_probs = D(imgs, classes_one_hot)
                 D_loss = (BCELoss(fake_probs, noisy_fake if opts.NOISY_LABELS else all_fake) + BCELoss(real_probs, noisy_real if opts.NOISY_LABELS else all_real))
                 D_loss.backward()
