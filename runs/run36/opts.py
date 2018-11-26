@@ -27,7 +27,7 @@ BATCH_SIZE = 16
 ADAM_LR = 0.0002
 ADAM_B = (0.5, 0.999)
 NUM_EPOCHS = 201
-A_BCE = 100.0
+A_BCE = 0.01
 A_MSE = 1.0
 
 # Model parameters
@@ -36,7 +36,7 @@ NDF = 64
 USE_CLASSES = False
 
 # Run parameters
-RUN_ID = 38
+RUN_ID = 36
 RUN_COMMENT = 'Varying A_BCE and A_MSE.'
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')

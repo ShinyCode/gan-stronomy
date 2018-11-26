@@ -145,7 +145,6 @@ def main():
                 save_model(G, G_optimizer, D, D_optimizer, iepoch, opts.MODEL_OUT_PATH)
 
     save_model(G, G_optimizer, D, D_optimizer, 'FINAL', opts.MODEL_OUT_PATH)
-    print('\a') # Ring the bell to alert the human
-    
+
 if __name__ == '__main__':
     main()
