@@ -22,45 +22,46 @@ def Conv2dSame(in_channels, out_channels, kernel_size, stride=1):
 class Generator(nn.Module):
     def __init__(self, embed_size, num_classes):
         super(Generator, self).__init__()
-        # TODO: Add padding for nn.ConvTranspose2d (as if we were using padding "same")
-        self.linear1 = nn.Linear(embed_size + num_classes, 1024)
-        self.linear2 = nn.Linear(1024, 1024) # Restriction: nn.Linear(b, a) -> nn.Linear(c, b)
-        self.deconv2d1 = Deconv2dSame(4, 64, 32, 5, stride=2) # (64, 4, 4) -> (32, 8, 8)
-        self.deconv2d2 = Deconv2dSame(8, 32, 32, 5, stride=2) # -> (32, 16, 16)
-        self.deconv2d3 = Deconv2dSame(16, 32, 32, 5, stride=2) # -> (32, 32, 32)
-        self.deconv2d4 = Deconv2dSame(32, 32, 3, 5, stride=2) # -> (3, 64, 64)
 
-    # x is (m, 1024), y is (m, n_classes)
+        self.main = nn.Sequential(
+            nn.ConvTranspose2d(embed_size + num_classes, 1024, 4, 1, 0),
+            nn.ELU(inplace=True),
+            nn.ConvTranspose2d(1024, 512, 4, 2, 1),
+            nn.ELU(inplace=True),
+            nn.ConvTranspose2d(512, 256, 4, 2, 1),
+            nn.ELU(inplace=True),
+            nn.ConvTranspose2d(256, 128, 4, 2, 1),
+            nn.ELU(inplace=True),
+            nn.ConvTranspose2d(128, 3, 4, 2, 1),
+            nn.Tanh()
+        )
+        
+    # z is (m, 1024), y is (m, n_classes)
     def forward(self, z, y):
         zy = torch.cat((z, y), -1)
-        linear_a1 = F.elu(self.linear1(zy))
-        linear_a2 = F.elu(self.linear2(linear_a1))
-        linear_a2_reshape = linear_a2.view(-1, 64, 4, 4)
-        deconv_a1 = F.elu(self.deconv2d1(linear_a2_reshape))
-        deconv_a2 = F.elu(self.deconv2d2(deconv_a1))
-        deconv_a3 = F.elu(self.deconv2d3(deconv_a2))
-        deconv_a4 = torch.sigmoid(self.deconv2d4(deconv_a3))
-        return deconv_a4
+        return self.main(zy[:, :, None, None])
 
 class Discriminator(nn.Module):
     def __init__(self, num_classes):
         super(Discriminator, self).__init__()
+
+        self.main = nn.Sequential(
+            nn.Conv2d(3, 128, 4, 2, 1),
+            nn.ELU(inplace=True),
+            nn.Conv2d(128, 256, 4, 2, 1),
+            nn.ELU(inplace=True),
+            nn.Conv2d(256, 512, 4, 2, 1),
+            nn.ELU(inplace=True),
+            nn.Conv2d(512, 1024, 4, 2, 1),
+            nn.ELU(inplace=True)
+        )
         # Layers
-        self.conv2d1 = Conv2dSame(3, 32, 5, stride=2) # (3, 64, 64) -> (32, 32, 32)
-        self.conv2d2 = Conv2dSame(32, 32, 5, stride=2) # -> (32, 16, 16)
-        self.conv2d3 = Conv2dSame(32, 32, 5, stride=2) # -> (32, 8, 8)
-        self.conv2d4 = Conv2dSame(32, 64, 5, stride=2) # -> (64, 4, 4)
-        self.linear1 = nn.Linear(1024 + num_classes, 512)
-        self.linear2 = nn.Linear(512, 1)
+        self.linear = nn.Linear(16384 + num_classes, 1)
 
     # x is (m, 128, 128, 3), y is (m, n_classes)
     def forward(self, x, y):
-        conv_a1 = F.elu(self.conv2d1(x))
-        conv_a2 = F.elu(self.conv2d2(conv_a1))
-        conv_a3 = F.elu(self.conv2d3(conv_a2))
-        conv_a4 = F.elu(self.conv2d4(conv_a3))
-        conv_a4_reshape = conv_a4.view(-1, 1024)
-        conv_a4_y = torch.cat((conv_a4_reshape, y), -1)
-        linear_a1 = F.elu(self.linear1(conv_a4_y))
-        linear_a2 = torch.sigmoid(self.linear2(linear_a1))
-        return linear_a2
+        z = self.main(x).view(-1, 16384)
+        print(z.shape)
+        
+        zy = torch.cat((z, y), -1)
+        return torch.sigmoid(self.linear(zy))
