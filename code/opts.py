@@ -27,7 +27,7 @@ NUM_EPOCHS = 1001
 # ALPHA = 0.0004
 
 # Run parameters
-RUN_ID = 15
+RUN_ID = 16
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
 # MODEL_PATH = '../runs/run11/models/model_run11_data100_100_0.pt'
