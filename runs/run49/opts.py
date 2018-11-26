@@ -17,7 +17,7 @@ torch.cuda.manual_seed_all(0)
 EMBED_SIZE = 1024
 IMAGE_SIZE = 64
 # TVT_SPLIT = [0.95, 0.025, 0.025]
-TVT_SPLIT = [975, 25, 0]
+TVT_SPLIT = [9975, 25, 0]
 TVT_SPLIT_LABELS = ['train', 'val', 'test']
 DATASET_NAME = 'data1000'
 DATA_PATH = os.path.abspath('../temp/%s/data.pkl' % DATASET_NAME)
@@ -26,7 +26,7 @@ DATA_PATH = os.path.abspath('../temp/%s/data.pkl' % DATASET_NAME)
 BATCH_SIZE = 64
 ADAM_LR = 0.0002
 ADAM_B = (0.5, 0.999)
-NUM_EPOCHS = 51
+NUM_EPOCHS = 26
 A_BCE = 1.0
 A_MSE = 0.0
 NOISY_LABELS = True
@@ -34,11 +34,11 @@ NOISY_LABELS = True
 # Model parameters
 NGF = 64
 NDF = 64
-USE_CLASSES = True
+USE_CLASSES = False
 
 # Run parameters
-RUN_ID = 50
-RUN_COMMENT = 'Overnight run prep'
+RUN_ID = 49
+RUN_COMMENT = 'Run simulating vanilla DCGAN'
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
 # MODEL_PATH = '../runs/run11/models/model_run11_data100_100_0.pt'
