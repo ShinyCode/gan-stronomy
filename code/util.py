@@ -14,6 +14,8 @@ import random
 import opts
 from opts import FloatTensor, LongTensor
 from torch.autograd import Variable
+import time
+import datetime
 
 IMAGE_SZ = 64
 DATA_ROOT = os.path.abspath('../../data')
@@ -28,6 +30,10 @@ VOCAB_PATH = os.path.join(DATA_ROOT, 'vocab.bin')
 IM2RECIPE_ROOT = os.path.abspath('../../im2recipe-Pytorch')
 GEN_EMBEDDINGS_ROOT = os.path.join(IM2RECIPE_ROOT, 'gen_embeddings.py')
 MODEL_PATH = os.path.join(DATA_ROOT, 'model_e500_v-8.950.pth.tar')
+
+def get_time():
+    ts = time.time()
+    return datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 
 def reload():
     imp.reload(sys.modules[__name__])

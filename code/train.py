@@ -35,7 +35,7 @@ def save_img(img_gen, iepoch, out_path, split_index, recipe_id, img_id):
     util.save_img(img_gen, out_path, filename)
 
 def print_loss(G_loss, D_loss, iepoch):
-    print("Epoch: %d\tG_Loss: %f\tD_Loss: %f" % (iepoch, G_loss, D_loss))
+    print("[%s] Epoch: %d\tG_Loss: %f\tD_Loss: %f" % (util.get_time(), iepoch, G_loss, D_loss))
 
 def save_model(G, G_optimizer, D, D_optimizer, iepoch, out_path):
     filename = '_'.join(['model', 'run%d' % opts.RUN_ID, opts.DATASET_NAME, str(iepoch)]) + '.pt'
@@ -112,21 +112,23 @@ def main():
             all_fake = Variable(FloatTensor(batch_size, 1).fill_(0.0), requires_grad=False).to(opts.DEVICE)
 
             # Train Generator
-            G_optimizer.zero_grad()
-            imgs_gen = G(recipe_embs, classes_one_hot)
-
-            fake_probs = D(imgs_gen, classes_one_hot) # TODO: maybe use MSE loss to condition generator
-            G_loss = BCELoss(fake_probs, all_real)
-            G_loss.backward()
-            G_optimizer.step()
+            for _ in range(opts.NUM_UPDATE_G):
+                G_optimizer.zero_grad()
+                imgs_gen = G(recipe_embs, classes_one_hot)
+                
+                fake_probs = D(imgs_gen, classes_one_hot) # TODO: maybe use MSE loss to condition generator
+                G_loss = BCELoss(fake_probs, all_real)
+                G_loss.backward()
+                G_optimizer.step()
 
             # Train Discriminator
-            D_optimizer.zero_grad()
-            fake_probs = D(imgs_gen.detach(), classes_one_hot)
-            real_probs = D(imgs, classes_one_hot)
-            D_loss = (BCELoss(fake_probs, all_fake) + BCELoss(real_probs, all_real)) / 2
-            D_loss.backward()
-            D_optimizer.step()
+            for _ in range(opts.NUM_UPDATE_D):
+                D_optimizer.zero_grad()
+                fake_probs = D(imgs_gen.detach(), classes_one_hot)
+                real_probs = D(imgs, classes_one_hot)
+                D_loss = (BCELoss(fake_probs, all_fake) + BCELoss(real_probs, all_real)) / 2
+                D_loss.backward()
+                D_optimizer.step()
 
             if iepoch % opts.INTV_PRINT_LOSS == 0 and not ibatch:
                 print_loss(G_loss, D_loss, iepoch)
