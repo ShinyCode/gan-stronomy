@@ -37,8 +37,8 @@ NDF = 64
 USE_CLASSES = False
 
 # Run parameters
-RUN_ID = 48
-RUN_COMMENT = 'Overnight run.'
+RUN_ID = 47
+RUN_COMMENT = 'Update discriminator more often.'
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
 # MODEL_PATH = '../runs/run11/models/model_run11_data100_100_0.pt'
