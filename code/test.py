@@ -31,6 +31,7 @@ def main():
     split_index = int(sys.argv[3])
     out_path = os.path.abspath(sys.argv[4])
 
+    util.create_dir(out_path)
     saved_model = torch.load(model_path)
 
     data = GANstronomyDataset(data_path, split=opts.TVT_SPLIT)

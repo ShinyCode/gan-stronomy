@@ -33,7 +33,7 @@ MODEL_PATH = os.path.join(DATA_ROOT, 'model_e500_v-8.950.pth.tar')
 
 def get_time():
     ts = time.time()
-    return datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+    return datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
 
 def reload():
     imp.reload(sys.modules[__name__])
