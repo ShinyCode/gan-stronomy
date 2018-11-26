@@ -26,8 +26,8 @@ DATA_PATH = os.path.abspath('../temp/%s/data.pkl' % DATASET_NAME)
 BATCH_SIZE = 64
 ADAM_LR = 0.0002
 ADAM_B = (0.5, 0.999)
-NUM_EPOCHS = 26
-A_BCE = 0.1
+NUM_EPOCHS = 6
+A_BCE = 0.01
 A_MSE = 1.0
 NOISY_LABELS = False
 
@@ -37,15 +37,15 @@ NDF = 64
 USE_CLASSES = False
 
 # Run parameters
-RUN_ID = 46
-RUN_COMMENT = 'Tweak A_BCE and train for more epochs'
+RUN_ID = 45
+RUN_COMMENT = 'Use both MSE and BCE loss'
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
 # MODEL_PATH = '../runs/run11/models/model_run11_data100_100_0.pt'
 MODEL_PATH = None # None means starting fresh
 MODEL_OUT_PATH = os.path.join(RUN_PATH, 'models')
 INTV_PRINT_LOSS = 1
-INTV_SAVE_IMG = 1
+INTV_SAVE_IMG = 5
 INTV_SAVE_MODEL = 1000
 NUM_UPDATE_G = 1
 NUM_UPDATE_D = 1
