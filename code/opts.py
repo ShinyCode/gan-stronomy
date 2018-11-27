@@ -37,7 +37,7 @@ NDF = 64
 USE_CLASSES = True
 
 # Run parameters
-RUN_ID = 57
+RUN_ID = 58
 RUN_COMMENT = 'Tuning from overnight run, only BCE. No MSES at all.'
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
