@@ -190,14 +190,11 @@ def get_variables2(noisy_real, noisy_fake):
     noisy_fake = Variable(noisy_fake.type(FloatTensor), requires_grad=False).to(opts.DEVICE)
     return noisy_real[:, None], noisy_fake[:, None]
 
-def get_variables3(recipe_ids, recipe_embs, img_ids, imgs, target_class, num_classes):
+def get_variables3(recipe_ids, recipe_embs, img_ids, imgs):
     batch_size = imgs.shape[0]
     recipe_embs = Variable(recipe_embs.type(FloatTensor)).to(opts.DEVICE)
     imgs = Variable(imgs.type(FloatTensor)).to(opts.DEVICE)
-    classes = torch.empty(batch_size, 1, dtype=torch.long).fill_(target_class)
-    classes = Variable(classes.type(LongTensor)).to(opts.DEVICE)
-    target_class_one_hot = Variable(FloatTensor(batch_size, num_classes).zero_().scatter_(1, classes.view(-1, 1), 1)).to(opts.DEVICE)
-    return batch_size, recipe_embs, imgs, target_class_one_hot
+    return batch_size, recipe_embs, imgs
     
 # Assumes image values are in [-1, 1]
 def save_img(img, out_path, filename):
