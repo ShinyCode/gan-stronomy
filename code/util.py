@@ -39,9 +39,11 @@ def get_time():
 def reload():
     imp.reload(sys.modules[__name__])
 
-def unpickle(filename):
+def unpickle(filename, i=0):
+    data = None
     with open(filename, 'rb') as f:
-        data = pickle.load(f)
+        for _ in range(i+1):
+            data = pickle.load(f)
     return data
 
 def unpickle2(filename):
@@ -58,6 +60,9 @@ def load_ids():
 
 def load_classes():
     return unpickle(CLASS_PATH)
+
+def load_class_names():
+    return unpickle(CLASS_PATH, 1)
 
 def load_ingredients():
     with open(INGR_PATH) as f:
