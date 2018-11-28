@@ -17,10 +17,10 @@ torch.cuda.manual_seed_all(0)
 EMBED_SIZE = 1024
 IMAGE_SIZE = 64
 # TVT_SPLIT = [0.95, 0.025, 0.025]
-TVT_SPLIT = [49800, 100, 100]
-# TVT_SPLIT = [9950, 50, 0]
+# TVT_SPLIT = [49800, 100, 100]
+TVT_SPLIT = [9950, 50, 0]
 TVT_SPLIT_LABELS = ['train', 'val', 'test']
-DATASET_NAME = 'data50000'
+DATASET_NAME = 'data10000'
 DATA_PATH = os.path.abspath('../temp/%s/data.pkl' % DATASET_NAME)
 
 # Training parameters
