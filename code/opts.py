@@ -17,9 +17,10 @@ torch.cuda.manual_seed_all(0)
 EMBED_SIZE = 1024
 IMAGE_SIZE = 64
 # TVT_SPLIT = [0.95, 0.025, 0.025]
-TVT_SPLIT = [49800, 100, 100]
+# TVT_SPLIT = [49800, 100, 100]
+TVT_SPLIT = [9950, 50, 0]
 TVT_SPLIT_LABELS = ['train', 'val', 'test']
-DATASET_NAME = 'data50000'
+DATASET_NAME = 'data10000'
 DATA_PATH = os.path.abspath('../temp/%s/data.pkl' % DATASET_NAME)
 
 # Training parameters
@@ -37,8 +38,8 @@ NDF = 64
 USE_CLASSES = True
 
 # Run parameters
-RUN_ID = 58
-RUN_COMMENT = 'Overnight run on data50000'
+RUN_ID = 59
+RUN_COMMENT = 'Interpolation'
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
 # MODEL_PATH = '../runs/run11/models/model_run11_data100_100_0.pt'
