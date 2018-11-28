@@ -9,7 +9,8 @@ class GANstronomyDataset(data.Dataset):
     def __init__(self, data_path, split):
         dataset = util.unpickle(data_path)
         self.data = dataset['data']
-        self.class_mapping = dataset['class_mapping']
+        self.class_mapping = dataset['class_mapping'] # Maps raw class to mapped class
+        self.inv_class_mapping = {self.class_mapping[c]:c for c in self.class_mapping}
         self.ids = sorted(list(self.data.keys()))
         random.Random(0).shuffle(self.ids)
         self.split = np.array(split) / np.sum(split)
@@ -56,3 +57,10 @@ class GANstronomyDataset(data.Dataset):
             if recipe_id in id_set:
                 return i
         return None
+
+    def get_class_name(self, recipe_id):
+        item = self.data[recipe_id]
+        klass = item['class']
+        real_class = self.inv_class_mapping[klass]
+        class_names = util.load_class_names()
+        return class_names[real_class]
