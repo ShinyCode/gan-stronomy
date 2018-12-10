@@ -56,4 +56,4 @@ class Discriminator(nn.Module):
     def forward(self, x, emb):
         z = self.main(x).view(-1, 4 * 4 * opts.NDF * 8)
         zemb = torch.cat((z, emb), -1)
-        return torch.sigmoid(self.linear(zemb))
+        return self.linear(zemb)
