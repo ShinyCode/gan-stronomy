@@ -37,9 +37,8 @@ def main():
     data = GANstronomyDataset(data_path, split=opts.TVT_SPLIT)
     data.set_split_index(split_index)
     data_loader = DataLoader(data, batch_size=opts.BATCH_SIZE, shuffle=False, sampler=SequentialSampler(data))
-
-    num_classes = data.num_classes()
-    G = Generator(opts.EMBED_SIZE, num_classes).to(opts.DEVICE)
+    
+    G = Generator(opts.LATENT_SIZE, opts.EMBED_SIZE).to(opts.DEVICE)
     G.load_state_dict(saved_model['G_state_dict'])
     G.eval()
 
@@ -48,8 +47,9 @@ def main():
     for ibatch, data_batch in enumerate(data_loader):
         with torch.no_grad():
             recipe_ids, recipe_embs, img_ids, imgs, classes, _, _ = data_batch
-            batch_size, recipe_embs, imgs, classes, classes_one_hot = util.get_variables(recipe_ids, recipe_embs, img_ids, imgs, classes, num_classes)
-            imgs_gen = G(recipe_embs, classes_one_hot)
+            batch_size, recipe_embs, imgs, = util.get_variables3(recipe_ids, recipe_embs, img_ids, imgs)
+            z = torch.randn(batch_size, opts.LATENT_SIZE).to(opts.DEVICE)
+            imgs_gen = G(z, recipe_embs)
             imgs, imgs_gen = imgs.detach(), imgs_gen.detach()
             for iexample in range(batch_size):
                 save_results(all_ingrs, imgs[iexample], imgs_gen[iexample], img_ids[iexample], recipe_ids[iexample], out_path)

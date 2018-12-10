@@ -15,12 +15,14 @@ torch.cuda.manual_seed_all(0)
 
 # Data parameters
 EMBED_SIZE = 1024
+LATENT_SIZE = 100
 IMAGE_SIZE = 64
 # TVT_SPLIT = [0.95, 0.025, 0.025]
-# TVT_SPLIT = [49800, 100, 100]
-TVT_SPLIT = [9950, 50, 0]
+TVT_SPLIT = [49800, 100, 100]
+# TVT_SPLIT = [9950, 50, 0]
+# TVT_SPLIT = [950, 50, 0]
 TVT_SPLIT_LABELS = ['train', 'val', 'test']
-DATASET_NAME = 'data10000'
+DATASET_NAME = 'data50000'
 DATA_PATH = os.path.abspath('../temp/%s/data.pkl' % DATASET_NAME)
 
 # Training parameters
@@ -28,9 +30,7 @@ BATCH_SIZE = 64
 ADAM_LR = 0.0002
 ADAM_B = (0.5, 0.999)
 NUM_EPOCHS = 61
-A_BCE = 1.0
-A_MSE = 0.0
-NOISY_LABELS = True
+LAMBDA = 10.0 # Weight of gradient penalty
 
 # Model parameters
 NGF = 64
@@ -39,7 +39,7 @@ USE_CLASSES = True
 
 # Run parameters
 RUN_ID = 59
-RUN_COMMENT = 'Interpolation'
+RUN_COMMENT = 'With latent space and wasserstein loss'
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
 # MODEL_PATH = '../runs/run11/models/model_run11_data100_100_0.pt'
@@ -48,5 +48,4 @@ MODEL_OUT_PATH = os.path.join(RUN_PATH, 'models')
 INTV_PRINT_LOSS = 1
 INTV_SAVE_IMG = 1
 INTV_SAVE_MODEL = 10
-NUM_UPDATE_G = 1
 NUM_UPDATE_D = 3

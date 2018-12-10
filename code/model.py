@@ -7,14 +7,11 @@ import opts
 
 # Pytorch uses [N, C, H, W]!
 class Generator(nn.Module):
-    def __init__(self, embed_size, num_classes):
+    def __init__(self, latent_size, embed_size):
         super(Generator, self).__init__()
-
-        if not opts.USE_CLASSES:
-            num_classes = 0
             
         self.main = nn.Sequential(
-            nn.ConvTranspose2d(embed_size + num_classes, opts.NGF * 8, 4, 1, 0, bias=False),
+            nn.ConvTranspose2d(latent_size + embed_size, opts.NGF * 8, 4, 1, 0, bias=False),
             nn.BatchNorm2d(opts.NGF * 8),
             nn.ReLU(inplace=True),
             nn.ConvTranspose2d(opts.NGF * 8, opts.NGF * 4, 4, 2, 1, bias=False),
@@ -30,19 +27,14 @@ class Generator(nn.Module):
             nn.Tanh()
         )
         
-    # z is (m, 1024), y is (m, n_classes)
-    def forward(self, z, y):
-        if opts.USE_CLASSES:
-            zy = torch.cat((z, y), -1)
-            return self.main(zy[:, :, None, None])
-        return self.main(z[:, :, None, None])
+    # emb is size 1024
+    def forward(self, z, emb):
+        zemb = torch.cat((z, emb), -1)
+        return self.main(zemb[:, :, None, None])
         
 class Discriminator(nn.Module):
-    def __init__(self, num_classes):
+    def __init__(self, embed_size):
         super(Discriminator, self).__init__()
-
-        if not opts.USE_CLASSES:
-            num_classes = 0
         
         self.main = nn.Sequential(
             nn.Conv2d(3, opts.NDF, 4, 2, 1, bias=False),
@@ -58,12 +50,10 @@ class Discriminator(nn.Module):
             nn.LeakyReLU(0.2, inplace=True)
         )
         # Layers
-        self.linear = nn.Linear(4 * 4 * opts.NDF * 8 + num_classes, 1, bias=False)
+        self.linear = nn.Linear(4 * 4 * opts.NDF * 8 + embed_size, 1, bias=False)
 
-    # x is (m, 128, 128, 3), y is (m, n_classes)
-    def forward(self, x, y):
+    # x is (m, 128, 128, 3)
+    def forward(self, x, emb):
         z = self.main(x).view(-1, 4 * 4 * opts.NDF * 8)
-        if opts.USE_CLASSES:
-            zy = torch.cat((z, y), -1)
-            return torch.sigmoid(self.linear(zy))
-        return torch.sigmoid(self.linear(z))
+        zemb = torch.cat((z, emb), -1)
+        return torch.sigmoid(self.linear(zemb))
