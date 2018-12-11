@@ -9,7 +9,11 @@ import opts
 class Generator(nn.Module):
     def __init__(self, latent_size, embed_size):
         super(Generator, self).__init__()
-            
+
+        if not opts.CONDITIONAL:
+            print('WARNING: USING UNCONDITIONED GENERATOR')
+            embed_size = 0
+        
         self.main = nn.Sequential(
             nn.ConvTranspose2d(latent_size + embed_size, opts.NGF * 8, 4, 1, 0, bias=False),
             nn.BatchNorm2d(opts.NGF * 8),
@@ -29,12 +33,18 @@ class Generator(nn.Module):
         
     # emb is size 1024
     def forward(self, z, emb):
+        if not opts.CONDITIONAL:
+            return self.main(z[:, :, None, None])
         zemb = torch.cat((z, emb), -1)
         return self.main(zemb[:, :, None, None])
-        
+
 class Discriminator(nn.Module):
     def __init__(self, embed_size):
         super(Discriminator, self).__init__()
+
+        if not opts.CONDITIONAL:
+            print('WARNING: USING UNCONDITIONED DISCRIMINATOR')
+            embed_size = 0
         
         self.main = nn.Sequential(
             nn.Conv2d(3, opts.NDF, 4, 2, 1, bias=False),
@@ -55,5 +65,7 @@ class Discriminator(nn.Module):
     # x is (m, 128, 128, 3)
     def forward(self, x, emb):
         z = self.main(x).view(-1, 4 * 4 * opts.NDF * 8)
+        if not opts.CONDITIONAL:
+            return torch.sigmoid(self.linear(z))
         zemb = torch.cat((z, emb), -1)
         return torch.sigmoid(self.linear(zemb))

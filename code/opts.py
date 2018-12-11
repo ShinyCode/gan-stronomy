@@ -35,11 +35,11 @@ LAMBDA = 10.0 # Weight of gradient penalty
 # Model parameters
 NGF = 64
 NDF = 64
-USE_CLASSES = True
+CONDITIONAL = False
 
 # Run parameters
-RUN_ID = 62
-RUN_COMMENT = 'With latent space and gan loss, 50k'
+RUN_ID = 63
+RUN_COMMENT = 'With latent space and gan loss, 50k, UNCONDITIONED'
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
 # MODEL_PATH = '../runs/run11/models/model_run11_data100_100_0.pt'
