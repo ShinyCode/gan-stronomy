@@ -5,3 +5,5 @@ temp
 \#*\#
 .\#*
 runs/run*/models
+runs/run*/real
+runs/run*/fake

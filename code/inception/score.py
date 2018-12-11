@@ -36,10 +36,9 @@ def main():
             recipe_ids, recipe_embs, img_ids, imgs, classes, _, _ = data_batch
             batch_size, recipe_embs, imgs, = util.get_variables3(recipe_ids, recipe_embs, img_ids, imgs)
             z = torch.randn(batch_size, opts.LATENT_SIZE).to(opts.DEVICE)
-            imgs_gen = G(z, recipe_embs)
-            imgs, imgs_gen = imgs_gen.detach()
-            fake_score_mean, fake_score_std = score.inception_score(imgs_gen, batch_size=len(data.size))
-            real_score_mean, real_score_std = score.inception_score(imgs, batch_size=len(data.size))
+            imgs_gen = G(z, recipe_embs).detach()
+            fake_score_mean, fake_score_std = score.inception_score(imgs_gen, batch_size=len(data) // 10, splits=10)
+            real_score_mean, real_score_std = score.inception_score(imgs, batch_size=len(data) // 10, splits=10)
             score_list.append((fake_score_mean, fake_score_std, real_score_mean, real_score_std))
 
     print(score_list)
