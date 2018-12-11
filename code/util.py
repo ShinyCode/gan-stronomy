@@ -17,6 +17,7 @@ from torch.autograd import Variable
 import time
 import datetime
 import torch
+import fid_score
 
 IMAGE_SZ = 64
 DATA_ROOT = os.path.abspath('../../data')
@@ -215,3 +216,20 @@ def get_valid_ingrs(ingrs, recipe_id):
         if valid:
             ret.add(ingr['text'])
     return ret
+
+def get_fid(G, recipe_embs, imgs):
+    batch_size = imgs.shape[0]
+    z = torch.randn(batch_size, opts.LATENT_SIZE).to(opts.DEVICE)
+    imgs_gen = G(z, recipe_embs)
+    return fid_score.calculate_fid_given_arrays(imgs, imgs_gen)
+    '''
+    for i in range(batch_size):
+        recipe_emb = recipe_embs[None, i].expand(num_samples, opts.EMBED_SIZE)
+        img = imgs[None, i]
+        z = torch.randn(num_samples, opts.LATENT_SIZE).to(opts.DEVICE)
+        imgs_gen = G(z, recipe_emb)
+        fids.append(fid_score.calculate_fid_given_arrays(img, imgs_gen))
+    '''
+        
+    
+    
