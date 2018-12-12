@@ -1,0 +1,5 @@
+flour
+salt
+egg
+potato
+nutmeg

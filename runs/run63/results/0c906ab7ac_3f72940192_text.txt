@@ -1,0 +1,8 @@
+cucumber
+sugar
+vinegar
+olive oil
+soy sauce
+tomatoes
+chicken
+honey
