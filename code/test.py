@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -------------------------------------------------------------
 # proj:    gan-stronomy
 # file:    test.py
