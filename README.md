@@ -1,2 +1,2 @@
-# gan-stronomy
-Generative cooking with DCGANs.
+# GAN-stronomy: Generative Cooking with Conditional DCGANs
+[Documentation coming soon!]
