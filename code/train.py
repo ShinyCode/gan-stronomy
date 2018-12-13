@@ -70,9 +70,7 @@ def main():
     # Load the data
     data = GANstronomyDataset(opts.DATA_PATH, split=opts.TVT_SPLIT)
     data.set_split_index(0)
-    data_loader = torch.utils.data.DataLoader(data,
-                                              batch_size=opts.BATCH_SIZE,
-                                              shuffle=True)
+    data_loader = torch.utils.data.DataLoader(data, batch_size=opts.BATCH_SIZE, shuffle=True)
 
     # Make the output directory
     util.create_dir(opts.RUN_PATH)
