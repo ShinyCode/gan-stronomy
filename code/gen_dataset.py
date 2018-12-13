@@ -1,3 +1,10 @@
+# -------------------------------------------------------------
+# proj:    gan-stronomy
+# file:    gen_dataset.py
+# authors: Mark Sabini, Zahra Abdullah, Darrith Phan
+# desc:    Generates custom dataset from Recipe1M and the embedding
+#          model trained by Salvador et al. (Im2Recipe)
+# -------------------------------------------------------------
 import util
 import os
 import numpy as np

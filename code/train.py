@@ -1,4 +1,10 @@
-# Based very loosely off https://github.com/eriklindernoren/PyTorch-GAN/blob/master/implementations/cgan/cgan.py
+# -------------------------------------------------------------
+# proj:    gan-stronomy
+# file:    train.py
+# authors: Mark Sabini, Zahra Abdullah, Darrith Phan
+# desc:    Code to adversarially train the generative cooking model.
+# refs:    https://github.com/eriklindernoren/PyTorch-GAN/blob/master/implementations/cgan/cgan.py
+# -------------------------------------------------------------
 import util
 import torch
 from torch.autograd import Variable

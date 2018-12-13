@@ -1,3 +1,9 @@
+# -------------------------------------------------------------
+# proj:    gan-stronomy
+# file:    interp.py
+# authors: Mark Sabini, Zahra Abdullah, Darrith Phan
+# desc:    Executable to perform latent space interpolation.
+# -------------------------------------------------------------
 import torch
 from torch.autograd import Variable
 from dataset import GANstronomyDataset

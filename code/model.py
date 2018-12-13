@@ -1,3 +1,9 @@
+# -------------------------------------------------------------
+# proj:    gan-stronomy
+# file:    model.py
+# authors: Mark Sabini, Zahra Abdullah, Darrith Phan
+# desc:    Conditional DCGAN architecture used for generative cooking.
+# -------------------------------------------------------------
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

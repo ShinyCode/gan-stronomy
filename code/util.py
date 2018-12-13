@@ -1,3 +1,9 @@
+# -------------------------------------------------------------
+# proj:    gan-stronomy
+# file:    util.py
+# authors: Mark Sabini, Zahra Abdullah, Darrith Phan
+# desc:    Menagerie of helpful utility functions
+# -------------------------------------------------------------
 import imp
 import numpy as np
 import pickle

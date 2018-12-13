@@ -1,3 +1,9 @@
+# -------------------------------------------------------------
+# proj:    gan-stronomy
+# file:    test.py
+# authors: Mark Sabini, Zahra Abdullah, Darrith Phan
+# desc:    Executable to run the model on images belonging to a split.
+# -------------------------------------------------------------
 import torch
 from torch.autograd import Variable
 from dataset import GANstronomyDataset

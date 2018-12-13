@@ -1,3 +1,9 @@
+# -------------------------------------------------------------
+# proj:    gan-stronomy
+# file:    opts.py
+# authors: Mark Sabini, Zahra Abdullah, Darrith Phan
+# desc:    File containing all options pertaining to training
+# -------------------------------------------------------------
 import torch
 import os
 import util

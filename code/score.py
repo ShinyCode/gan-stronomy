@@ -1,3 +1,10 @@
+# -------------------------------------------------------------
+# proj:    gan-stronomy
+# file:    score.py
+# authors: Mark Sabini, Zahra Abdullah, Darrith Phan
+# desc:    Computes FID as a quantitative metric of image quality.
+# refs:    https://github.com/mseitzer/pytorch-fid
+# -------------------------------------------------------------
 import torch
 from torch.autograd import Variable
 from dataset import GANstronomyDataset

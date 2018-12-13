@@ -1,3 +1,9 @@
+# -------------------------------------------------------------
+# proj:    gan-stronomy
+# file:    dataset.py
+# authors: Mark Sabini, Zahra Abdullah, Darrith Phan
+# desc:    Custom Pytorch Dataset that internally supports data splits
+# -------------------------------------------------------------
 import torch.utils.data as data
 import util
 import numpy as np
