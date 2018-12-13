@@ -44,8 +44,8 @@ def main():
 
     val_imgs, val_imgs_gen = get_val_imgs(G, data)
     test_imgs = get_test_imgs(data)
-    print('FID test|real: %f' % util.get_fid(test_imgs, val_imgs))
-    print('FID test|fake: %f' % util.get_fid(test_imgs, val_imgs_gen))
+    print('FID(test_real, val_real): %f' % util.get_fid(test_imgs, val_imgs))
+    print('FID(test_real, val_fake): %f' % util.get_fid(test_imgs, val_imgs_gen))
    
 if __name__ == '__main__':
     main()

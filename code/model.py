@@ -1,11 +1,8 @@
-# TODO: perform any necessary preprocessing on x (like scale pixel values to [-1, 1], etc)
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import opts
 
-# Pytorch uses [N, C, H, W]!
 class Generator(nn.Module):
     def __init__(self, latent_size, embed_size):
         super(Generator, self).__init__()
@@ -31,7 +28,7 @@ class Generator(nn.Module):
             nn.Tanh()
         )
         
-    # emb is size 1024
+    # z is [B, opts.LATENT_SIZE], emb is size [B, opts.EMBED_SIZE]
     def forward(self, z, emb):
         if not opts.CONDITIONAL:
             return self.main(z[:, :, None, None])
@@ -59,10 +56,10 @@ class Discriminator(nn.Module):
             nn.BatchNorm2d(opts.NDF * 8),
             nn.LeakyReLU(0.2, inplace=True)
         )
-        # Layers
+
         self.linear = nn.Linear(4 * 4 * opts.NDF * 8 + embed_size, 1, bias=False)
 
-    # x is (m, 128, 128, 3)
+    # x is [B, 3, opts.IMAGE_SIZE, opts.IMAGE_SIZE], emb is size [B, opts.EMBED_SIZE]
     def forward(self, x, emb):
         z = self.main(x).view(-1, 4 * 4 * opts.NDF * 8)
         if not opts.CONDITIONAL:

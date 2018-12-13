@@ -4,8 +4,6 @@ import numpy as np
 import random
 
 class GANstronomyDataset(data.Dataset):
-    # data = GANstronomyDataset(DATA_PATH, [0.6, 0.2, 0.2])
-    # data.set_split_index(0)
     def __init__(self, data_path, split):
         dataset = util.unpickle(data_path)
         self.data = dataset['data']
