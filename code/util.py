@@ -217,11 +217,8 @@ def get_valid_ingrs(ingrs, recipe_id):
             ret.add(ingr['text'])
     return ret
 
-def get_fid(G, recipe_embs, imgs):
-    batch_size = imgs.shape[0]
-    z = torch.randn(batch_size, opts.LATENT_SIZE).to(opts.DEVICE)
-    imgs_gen = G(z, recipe_embs)
-    return fid_score.calculate_fid_given_arrays(imgs, imgs_gen)
+def get_fid(imgs1, imgs2):
+    return fid_score.calculate_fid_given_arrays(imgs1, imgs2)
     '''
     for i in range(batch_size):
         recipe_emb = recipe_embs[None, i].expand(num_samples, opts.EMBED_SIZE)
