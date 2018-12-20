@@ -20,7 +20,7 @@ project
 ┗━ im2recipe-Pytorch
 ```
 
-1. Clone the `gan-stronomy` repo, and install the requirements:
+1. Clone the `gan-stronomy` repo and install the requirements:
 
    ```
    >> cd [project]
@@ -28,15 +28,14 @@ project
    >> pip install -r gan-stronomy/requirements.txt
    ```
 
-2. Clone the `im2recipe` repo, copy our `gen_embeddings.py` script as follows, and install the requirements:
+2. Clone the `im2recipe` repo and copy our `gen_embeddings.py` script as follows:
 
    ```
    >> git clone https://github.com/torralba-lab/im2recipe-Pytorch
    >> cp gan-stronomy/code/gen_embeddings.py im2recipe-Pytorch/
-   >> pip install -r im2recipe-Pytorch/requirements.txt
    ```
 
-   Since we're using Python 3 (and `im2recipe` uses Python 2), we call their code via a subprocess.
+   Since we're using Python 3 and `im2recipe` uses Python 2, we call their code via a subprocess.
 
 3. Create the `data` directory. Since it'll need a lot of space, you optionally can use our utility to mount a disk to that location (if desired):
 
