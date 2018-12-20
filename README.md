@@ -119,7 +119,7 @@ project
 
 ## Evaluation
 
-In `project/gan-stronomy/code`, we've written an assortment of scripts to probe the performance and behavior of a trained model. In all cases, `[SPLIT_INDEX]` refers to the data split to use (*train* is $0$, *val* is $1$, *test* is $2$).
+In `project/gan-stronomy/code`, we've written an assortment of scripts to probe the performance and behavior of a trained model. In all cases, `[SPLIT_INDEX]` refers to the data split to use (*train* is 0, *val* is 1, *test* is 2).
 
 1. `test.py`: Runs the generator on a specified split of data, and outputs the generated images, corresponding ground truth images, and associated ingredient lists.
 
@@ -133,13 +133,13 @@ In `project/gan-stronomy/code`, we've written an assortment of scripts to probe 
    >> python3 sample.py [MODEL_PATH] [DATA_PATH] [SPLIT_INDEX] [OUT_PATH] [RECIPE_ID] [NUM_SAMPLES]
    ```
 
-3. `interp.py`: Samples noise vectors $\mathbf{z}_1$ and $\mathbf{z}_2$ and runs the generator on a fixed embedding with noise input $(1 - \alpha)\mathbf{z}_1 + \alpha\mathbf{z}_2$ (for $\alpha \in [0, 1]$). Outputs the generated images.
+3. `interp.py`: Samples noise vectors <img src="https://latex.codecogs.com/gif.latex?\mathbf{z}_1" title="\mathbf{z}_1" /> and <img src="https://latex.codecogs.com/gif.latex?\mathbf{z}_2" title="\mathbf{z}_2" /> and runs the generator on a fixed embedding with noise input <img src="https://latex.codecogs.com/gif.latex?$(1&space;-&space;\alpha)\mathbf{z}_1&space;&plus;&space;\alpha\mathbf{z}_2$" title="$(1 - \alpha)\mathbf{z}_1 + \alpha\mathbf{z}_2$" /> (for <img src="https://latex.codecogs.com/gif.latex?$\alpha&space;\in&space;[0,&space;1]$" title="$\alpha \in [0, 1]$" />). Outputs the generated images.
 
    ```
    >> python3 interp.py [MODEL_PATH] [DATA_PATH] [SPLIT_INDEX] [OUT_PATH] [RECIPE_ID] [NUM_DIV]
    ```
 
-4. `score.py`: For a given model, computes and outputs $\mathrm{FID}(S_T, S_V)$ and $\mathrm{FID}(S_T, S_V^{(M)})$, as described in the report. Splits $1$ and $2$ must be nonempty!
+4. `score.py`: For a given model, computes and outputs <img src="https://latex.codecogs.com/gif.latex?$\mathrm{FID}(S_T,&space;S_V)$" title="$\mathrm{FID}(S_T, S_V)$" /> and <img src="https://latex.codecogs.com/gif.latex?$\mathrm{FID}(S_T,&space;S_V^{(M)})$" title="$\mathrm{FID}(S_T, S_V^{(M)})$" />, as described in the report. Splits 1 and 2 must be nonempty!
 
    ```
    >> python3 score.py [MODEL_PATH] [DATA_PATH]
@@ -149,7 +149,7 @@ In `project/gan-stronomy/code`, we've written an assortment of scripts to probe 
 
 **Generative Cooking**
 
-Examples of generative cooking after training on $49,800$ examples from Recipe1M for $90$ epochs.
+Examples of generative cooking after training on 49,800 examples from Recipe1M for 90 epochs.
 
 <p align="center"><img width="60%" src="figs/generative-cooking.png"></p>
 
@@ -170,3 +170,6 @@ Interpolating between generator noise inputs for a fixed embedding led to smooth
 Conditioning on recipe embeddings had a noticeable impact on the consistency of the generator outputs.
 
 <p align="center"><img width="60%" src="figs/conditioning.png"></p>
+
+---
+The [CodeCogs LaTeX Editor](https://www.codecogs.com/latex/eqneditor.php) was used to typeset the equations in this document.
