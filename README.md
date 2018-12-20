@@ -1,5 +1,4 @@
 # GAN-stronomy: Generative Cooking with Conditional DCGANs
-
 We trained conditional DCGANs to **generatively cook recipes** for our final project for Stanford's Deep Generative Models class (CS 236)!
 
 <img style='width:60%' src='figs/input-output.png'>

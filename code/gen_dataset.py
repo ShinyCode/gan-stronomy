@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -------------------------------------------------------------
+# proj:    gan-stronomy
+# file:    gen_dataset.py
+# authors: Mark Sabini, Zahra Abdullah, Darrith Phan
+# desc:    Generates custom dataset from Recipe1M and the embedding
+#          model trained by Salvador et al. (Im2Recipe)
+# -------------------------------------------------------------
 import util
 import os
 import numpy as np
@@ -66,9 +74,6 @@ def gen_dataset(N, data_path, compute_embed=True):
                         '--model_path=%s' % util.MODEL_PATH,
                         '--data_path=%s' % data_path,
                         '--path_results=%s' % data_path])
-        # Need to call their code to read in sliced lmdb, and compute embeddings on recipes
-        # Call python3 test.py [model stuff] [data location] [embed location]
-        # Say it saves a pickle file of a dict mapping recipe_id -> embedding in temp_path/embed.pkl
         embeddings = util.unpickle2(os.path.join(data_path, 'rec_embeds.pkl'))
         embedding_ids = util.unpickle2(os.path.join(data_path, 'rec_ids.pkl'))
         for i, embedding_id in enumerate(embedding_ids):

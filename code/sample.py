@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+# -------------------------------------------------------------
+# proj:    gan-stronomy
+# file:    sample.py
+# authors: Mark Sabini, Zahra Abdullah, Darrith Phan
+# desc:    Executable to sample points from model given a recipe embedding id.
+# -------------------------------------------------------------
 import torch
 from torch.autograd import Variable
 from dataset import GANstronomyDataset

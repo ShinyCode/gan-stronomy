@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Modified from https://github.com/mseitzer/pytorch-fid
 """Calculates the Frechet Inception Distance (FID) to evalulate GANs
 
 The FID metric calculates the distance between two distributions of images.

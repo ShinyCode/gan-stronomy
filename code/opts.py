@@ -1,3 +1,9 @@
+# -------------------------------------------------------------
+# proj:    gan-stronomy
+# file:    opts.py
+# authors: Mark Sabini, Zahra Abdullah, Darrith Phan
+# desc:    File containing all options pertaining to training
+# -------------------------------------------------------------
 import torch
 import os
 import util
@@ -17,10 +23,7 @@ torch.cuda.manual_seed_all(0)
 EMBED_SIZE = 1024
 LATENT_SIZE = 100
 IMAGE_SIZE = 64
-# TVT_SPLIT = [0.95, 0.025, 0.025]
 TVT_SPLIT = [49800, 100, 100]
-# TVT_SPLIT = [9950, 50, 0]
-# TVT_SPLIT = [950, 50, 0]
 TVT_SPLIT_LABELS = ['train', 'val', 'test']
 DATASET_NAME = 'data50000'
 DATA_PATH = os.path.abspath('../temp/%s/data.pkl' % DATASET_NAME)
@@ -35,14 +38,13 @@ LAMBDA = 10.0 # Weight of gradient penalty
 # Model parameters
 NGF = 64
 NDF = 64
-CONDITIONAL = False
+CONDITIONAL = True
 
 # Run parameters
-RUN_ID = 63
-RUN_COMMENT = 'With latent space and gan loss, 50k, UNCONDITIONED'
+RUN_ID = 64
+RUN_COMMENT = 'Type your run comment here!'
 RUN_PATH = os.path.abspath('../runs/run%d' % RUN_ID)
 IMG_OUT_PATH = os.path.join(RUN_PATH, 'out')
-# MODEL_PATH = '../runs/run11/models/model_run11_data100_100_0.pt'
 MODEL_PATH = None # None means starting fresh
 MODEL_OUT_PATH = os.path.join(RUN_PATH, 'models')
 INTV_PRINT_LOSS = 1

@@ -1,4 +1,11 @@
-# Based loosely off https://github.com/eriklindernoren/PyTorch-GAN/blob/master/implementations/cgan/cgan.py
+#!/usr/bin/env python3
+# -------------------------------------------------------------
+# proj:    gan-stronomy
+# file:    train.py
+# authors: Mark Sabini, Zahra Abdullah, Darrith Phan
+# desc:    Code to adversarially train the generative cooking model.
+# refs:    https://github.com/eriklindernoren/PyTorch-GAN/blob/master/implementations/cgan/cgan.py
+# -------------------------------------------------------------
 import util
 import torch
 from torch.autograd import Variable
@@ -15,30 +22,6 @@ from opts import FloatTensor, LongTensor
 import shutil
 
 BCELoss = torch.nn.BCELoss()
-MSELoss = torch.nn.MSELoss()
-
-def wasserstein_loss(G, D, imgs_real, recipe_embs):
-    batch_size = imgs_real.shape[0]
-    z = torch.randn(batch_size, opts.LATENT_SIZE).to(opts.DEVICE)
-    a = torch.rand(batch_size, 1, 1, 1).to(opts.DEVICE)
-    imgs_r = a * G(z, recipe_embs) + (1.0 - a) * imgs_real
-    dd = torch.autograd.grad(torch.sum(D(imgs_r, recipe_embs)), imgs_r, create_graph=True)[0]
-    dd_norm = torch.sqrt(torch.sum(dd ** 2, dim=(1, 2, 3)))
-    gp = torch.mean((dd_norm - 1.0) ** 2)
-    D_loss = torch.mean(D(G(z, recipe_embs), recipe_embs)) - torch.mean(D(imgs_real, recipe_embs)) + opts.LAMBDA * gp
-    G_loss = -torch.mean(D(G(z, recipe_embs), recipe_embs))
-    return D_loss, G_loss
-
-def gan_loss(G, D, imgs, recipe_embs, noisy_real, noisy_fake):
-    batch_size = imgs.shape[0]
-    z = torch.randn(batch_size, opts.LATENT_SIZE).to(opts.DEVICE)
-    imgs_gen = G(z, recipe_embs)
-    fake_probs = D(imgs_gen.detach(), recipe_embs)
-    real_probs = D(imgs, recipe_embs)
-    D_loss = BCELoss(fake_probs, noisy_fake) + BCELoss(real_probs, noisy_real)
-    all_real = Variable(FloatTensor(batch_size, 1).fill_(1.0), requires_grad=False).to(opts.DEVICE)
-    G_loss = BCELoss(fake_probs, all_real)
-    return D_loss, G_loss
 
 def get_img_gen(data, split_index, G, iepoch, out_path):
     old_split_index = data.split_index
@@ -87,9 +70,7 @@ def main():
     # Load the data
     data = GANstronomyDataset(opts.DATA_PATH, split=opts.TVT_SPLIT)
     data.set_split_index(0)
-    data_loader = torch.utils.data.DataLoader(data,
-                                              batch_size=opts.BATCH_SIZE,
-                                              shuffle=True)
+    data_loader = torch.utils.data.DataLoader(data, batch_size=opts.BATCH_SIZE, shuffle=True)
 
     # Make the output directory
     util.create_dir(opts.RUN_PATH)
@@ -134,10 +115,8 @@ def main():
 
             # Adversarial ground truths
             all_real = Variable(FloatTensor(batch_size, 1).fill_(1.0), requires_grad=False).to(opts.DEVICE)
-            # all_fake = Variable(FloatTensor(batch_size, 1).fill_(0.0), requires_grad=False).to(opts.DEVICE)
 
             z = torch.randn(batch_size, opts.LATENT_SIZE).to(opts.DEVICE)
-            # D_loss, G_loss = wasserstein_loss(G, D, imgs, recipe_embs)
             
             # Train Discriminator
             z = torch.randn(batch_size, opts.LATENT_SIZE).to(opts.DEVICE)
