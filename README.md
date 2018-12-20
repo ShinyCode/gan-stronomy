@@ -5,7 +5,7 @@ We trained conditional DCGANs to **generatively cook recipes** for our final pro
 
 ## Setup
 
-Our code is written in Python 3, and we used the Deep Learning VM (PyTorch) with an NVIDIA Tesla K80 GPU, 8 vCPUs, and 30 GB of RAM.
+Our code is written in Python 3, and we used the Google Cloud Deep Learning VM (PyTorch 0.4.1) with an NVIDIA Tesla K80 GPU, 8 vCPUs, and 30 GB of RAM.
 
 For the purposes of setup, we'll work in a directory called `project` (though this can really be named anything). After setup is complete, your directory structure should look something like this:
 
@@ -20,19 +20,19 @@ project
 ┗━ im2recipe-Pytorch
 ```
 
-1. Clone the `gan-stronomy` repo and install the requirements:
+1. Clone the `gan-stronomy` repo:
 
    ```
    >> cd [project]
    >> git clone https://github.com/ShinyCode/gan-stronomy
-   >> pip install -r gan-stronomy/requirements.txt
    ```
 
-2. Clone the `im2recipe` repo and copy our `gen_embeddings.py` script as follows:
+2. Clone the `im2recipe` repo, copy our `gen_embeddings.py` script over, and install the requirements:
 
    ```
    >> git clone https://github.com/torralba-lab/im2recipe-Pytorch
    >> cp gan-stronomy/code/gen_embeddings.py im2recipe-Pytorch/
+   >> pip install -r im2recipe-Pytorch/requirements.txt
    ```
 
    Since we're using Python 3 and `im2recipe` uses Python 2, we call their code via a subprocess.
