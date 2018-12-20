@@ -3,7 +3,7 @@ We trained conditional DCGANs to **generatively cook recipes** for our final pro
 
 <p align="center"><img width="60%" src="figs/input-output.png"></p>
 
-### Setup
+## Setup
 
 Our code is written in Python 3, and we used the Deep Learning VM (PyTorch) with an NVIDIA Tesla K80 GPU, 8 vCPUs, and 30 GB of RAM.
 
@@ -91,7 +91,7 @@ project
 
    This will likely give an error the first time around - the `im2recipe` repo has a few minor bugs which you'll need to iron out. If you get an out of memory error, then you'll likely need to change the batch size in their `args.py` to be smaller.
 
-### Training
+## Training
 
 1. All the parameters associated with training are located in `project/gan-stronomy/code/opts.py`. The key ones you need to be concerned about are:
 
@@ -117,7 +117,7 @@ project
 
 3. The script will courteously ring the system bell to alert the human when training is complete.
 
-### Evaluation
+## Evaluation
 
 In `project/gan-stronomy/code`, we've written an assortment of scripts to probe the performance and behavior of a trained model. In all cases, `[SPLIT_INDEX]` refers to the data split to use (*train* is $0$, *val* is $1$, *test* is $2$).
 
@@ -145,7 +145,7 @@ In `project/gan-stronomy/code`, we've written an assortment of scripts to probe 
    >> python3 score.py [MODEL_PATH] [DATA_PATH]
    ```
 
-### Gallery
+## Gallery
 
 **Generative Cooking**
 
