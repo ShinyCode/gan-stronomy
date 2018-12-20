@@ -1,7 +1,7 @@
 # GAN-stronomy: Generative Cooking with Conditional DCGANs
 We trained conditional DCGANs to **generatively cook recipes** for our final project for Stanford's Deep Generative Models class (CS 236)!
 
-<img style='width:60%' src='figs/input-output.png'>
+<p align="center"><img width="60%" src="figs/input-output.png"></p>
 
 ### Setup
 
@@ -151,22 +151,22 @@ In `project/gan-stronomy/code`, we've written an assortment of scripts to probe 
 
 Examples of generative cooking after training on $49,800$ examples from Recipe1M for $90$ epochs.
 
-<img style='width:60%' src='figs/generative-cooking.png'>
+<p align="center"><img width="60%" src="figs/generative-cooking.png"></p>
 
 **Ablative Study of MSE Loss**
 
 Using an MSE loss term in the generator had detrimental effects on output image quality, likely due to the one-to-many nature of the embedding-image mapping.
 
-<img style='width:60%' src='figs/mse.png'>
+<p align="center"><img width="60%" src="figs/mse.png"></p>
 
 **Latent Space Interpolation**
 
 Interpolating between generator noise inputs for a fixed embedding led to smooth blending between dishes.
 
-<img style='width:60%' src='figs/interpolation.png'>
+<p align="center"><img width="60%" src="figs/interpolation.png"></p>
 
 **Effect of Conditioning**
 
 Conditioning on recipe embeddings had a noticeable impact on the consistency of the generator outputs.
 
-<img style='width:60%' src='figs/conditioning.png'>
+<p align="center"><img width="60%" src="figs/conditioning.png"></p>
